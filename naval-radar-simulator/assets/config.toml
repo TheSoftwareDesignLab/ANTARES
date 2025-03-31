@@ -1,0 +1,21 @@
+[radar]
+
+[radar.protocol]
+host = "0.0.0.0"
+num_workers_tci = 1
+num_workers_tdi = 1
+
+[radar.detector]
+range = 100.0
+speed = 0.0
+angle = 0.0
+start_coordinates = [4.0, -72.0]
+
+[simulation]
+emission_interval = 20
+
+[simulation.ships]
+line = [{ initial_position = [-50.0, 50.0], angle = 0.785, speed = 5.0 }]
+circle = [{ initial_position = [50.0, -50.0], radius = 20.0, speed = 5.0 }]
+random = [{ initial_position = [-50.0, -50.0], max_speed = 20.0 }]
+stationary = [{ initial_position = [50.0, 50.0] }]
