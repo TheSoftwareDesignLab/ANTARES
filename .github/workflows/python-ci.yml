@@ -30,27 +30,19 @@ jobs:
           curl -Ls https://astral.sh/uv/install.sh | bash
           echo "$HOME/.cargo/bin" >> $GITHUB_PATH
 
-      - name: Create and activate venv
-        run: |
-          uv venv
-          source .venv/bin/activate
-          uv pip install -U uv
-
       - name: Install dependencies
         run: |
-          uv pip install -r requirements.txt || true
           uv pip install -e .
-          uv pip install pytest mypy ruff
+          uv pip install pytest mypy ruff build
 
       - name: Run linters
-        run: ruff check .
+        run: python -m ruff check .
 
       - name: Run formatters
-        run: ruff format --check .
+        run: python -m ruff format --check .
 
       - name: Run mypy
         run: mypy src/
 
       - name: Run tests with coverage
         run: pytest --cov=src --cov-report=term-missing --cov-fail-under=80
-
