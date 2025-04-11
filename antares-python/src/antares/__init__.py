@@ -1,3 +1,4 @@
-from .core import saludar
+from .client import AntaresClient
+from .models.ship import ShipConfig
 
-__all__ = ["saludar"]
+__all__ = ["AntaresClient", "ShipConfig"]

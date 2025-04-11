@@ -33,7 +33,7 @@ jobs:
       - name: Install dependencies
         run: |
           uv pip install --system -e .
-          uv pip install --system pytest pytest-cov mypy ruff build
+          uv pip install --system pytest pytest-cov pytest-mock mypy ruff build
         
 
       - name: Run linters
