@@ -1,0 +1,40 @@
+[project]
+name = "antares-python"
+version = "0.1.0"
+description = "Python interface for the Antares simulation software"
+authors = [{ name = "Juan Sebastian Urrea-Lopez", email = "js.urrea@uniandes.edu.co" }]
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = []
+
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.ruff]
+line-length = 88
+lint.select = ["E", "F", "I", "UP", "B", "PL"]
+exclude = ["dist", "build"]
+
+[tool.mypy]
+strict = true
+python_version = "3.13"
+files = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = "src"
+addopts = "-ra -q -ra -q --cov=src --cov-report=term-missing"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.taskipy.tasks]
+lint = "ruff check . --fix"
+format = "ruff format ."
+typecheck = "mypy src/"
+test = "pytest"
+coverage = "pytest --cov=src --cov-report=term-missing"
+build = "python -m build"
+publish = "twine upload dist/* --repository antares-python"
+check = "task lint && task typecheck && task test"
+release = "task check && task build && task publish"
