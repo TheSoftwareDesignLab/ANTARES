@@ -9,11 +9,15 @@ readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "pydantic>=2.11.3",
+    "pydantic-settings>=2.8.1",
     "httpx>=0.28.1",
     "typer>=0.15.2",
     "rich>=13.0",
     "tomli>=2.2.1",
 ]
+
+[project.optional-dependencies]
+dev = ["pytest-asyncio>=0.26.0"]
 
 [project.scripts]
 antares = "antares.cli:app"
@@ -34,6 +38,8 @@ files = ["src"]
 
 [tool.pytest.ini_options]
 pythonpath = "src"
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
 addopts = "-ra -q -ra -q --cov=src --cov-report=term-missing"
 
 [tool.setuptools.packages.find]
@@ -47,5 +53,5 @@ test = "pytest"
 coverage = "pytest --cov=src --cov-report=term-missing"
 build = "python -m build"
 publish = "twine upload dist/* --repository antares-python"
-check = "task lint && task typecheck && task test"
+check = "task lint && task format && task typecheck && task test"
 release = "task check && task build && task publish"

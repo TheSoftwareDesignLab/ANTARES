@@ -9,9 +9,7 @@ class RestClient:
     Internal client for interacting with the Antares simulation REST API.
     """
 
-    def __init__(
-        self, base_url: str, timeout: float = 5.0, auth_token: str | None = None
-    ) -> None:
+    def __init__(self, base_url: str, timeout: float = 5.0, auth_token: str | None = None) -> None:
         """
         Initializes the REST client.
 

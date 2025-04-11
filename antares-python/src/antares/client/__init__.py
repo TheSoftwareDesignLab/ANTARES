@@ -20,23 +20,24 @@ class AntaresClient:
         Accepts config overrides directly or falls back to environment-based configuration.
         """
 
+        overrides = {
+            "base_url": base_url,
+            "tcp_host": tcp_host,
+            "tcp_port": tcp_port,
+            "timeout": timeout,
+            "auth_token": auth_token,
+        }
+        clean_overrides = {k: v for k, v in overrides.items() if v is not None}
+
         # Merge provided arguments with environment/.env via AntaresSettings
-        self._settings = AntaresSettings(
-            base_url=base_url,
-            tcp_host=tcp_host,
-            tcp_port=tcp_port,
-            timeout=timeout,
-            auth_token=auth_token,
-        )
+        self._settings = AntaresSettings(**clean_overrides)
 
         self._rest = RestClient(
             base_url=self._settings.base_url,
             timeout=self._settings.timeout,
             auth_token=self._settings.auth_token,
         )
-        self._tcp = TCPSubscriber(
-            host=self._settings.tcp_host, port=self._settings.tcp_port
-        )
+        self._tcp = TCPSubscriber(host=self._settings.tcp_host, port=self._settings.tcp_port)
 
     def reset_simulation(self) -> None:
         """

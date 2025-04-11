@@ -1,3 +1,5 @@
+import asyncio
+
 import pytest
 from typer.testing import CliRunner
 
@@ -30,20 +32,21 @@ def test_cli_reset(mocker, fake_config):
 
 def test_cli_add_ship(mocker, fake_config):
     mock_add = mocker.patch("antares.client.rest.RestClient.add_ship")
-    result = runner.invoke(
-        app, ["add-ship", "--x", "5.0", "--y", "6.0", "--config", fake_config]
-    )
+    result = runner.invoke(app, ["add-ship", "--x", "5.0", "--y", "6.0", "--config", fake_config])
     assert result.exit_code == 0
     assert "Added ship at (5.0, 6.0)" in result.output
     mock_add.assert_called_once()
 
 
-@pytest.mark.asyncio
-async def test_cli_subscribe(monkeypatch, fake_config):
-    async def fake_sub():
+def test_cli_subscribe(monkeypatch, mocker, fake_config):
+    async def fake_sub(self):
         yield {"event": "test-event"}
 
     monkeypatch.setattr("antares.client.tcp.TCPSubscriber.subscribe", fake_sub)
+
+    # Use a fresh event loop
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
     result = runner.invoke(app, ["subscribe", "--config", fake_config])
     assert result.exit_code == 0
     assert "test-event" in result.output

@@ -1,6 +1,8 @@
 import logging
 from pathlib import Path
+
 from rich.logging import RichHandler
+
 
 def setup_logging(log_file: str = "antares.log", level: int = logging.INFO) -> None:
     """Configure logging to both rich console and a file."""
@@ -12,6 +14,6 @@ def setup_logging(log_file: str = "antares.log", level: int = logging.INFO) -> N
         datefmt="[%Y-%m-%d %H:%M:%S]",
         handlers=[
             RichHandler(rich_tracebacks=True, show_path=False),
-            logging.FileHandler(log_file, encoding="utf-8")
-        ]
+            logging.FileHandler(log_file, encoding="utf-8"),
+        ],
     )

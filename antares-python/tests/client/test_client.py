@@ -21,7 +21,7 @@ def test_add_ship_delegates(mocker):
 
 @pytest.mark.asyncio
 async def test_subscribe_delegates(monkeypatch):
-    async def fake_subscribe():
+    async def fake_subscribe(_self):
         yield {"event": "test"}
 
     monkeypatch.setattr("antares.client.tcp.TCPSubscriber.subscribe", fake_subscribe)

@@ -1,4 +1,4 @@
-from pydantic import BaseSettings, Field
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 class AntaresSettings(BaseSettings):
@@ -7,12 +7,14 @@ class AntaresSettings(BaseSettings):
     Supports environment variables and `.env` file loading.
     """
 
-    base_url: str = Field(..., env="ANTARES_BASE_URL")
-    tcp_host: str = Field("localhost", env="ANTARES_TCP_HOST")
-    tcp_port: int = Field(9000, env="ANTARES_TCP_PORT")
-    timeout: float = Field(5.0, env="ANTARES_TIMEOUT")
-    auth_token: str | None = Field(None, env="ANTARES_AUTH_TOKEN")
+    base_url: str
+    tcp_host: str = "localhost"
+    tcp_port: int = 9000
+    timeout: float = 5.0
+    auth_token: str | None = None
 
-    class Config:
-        env_file = ".env"
-        case_sensitive = False
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_prefix="ANTARES_",
+        case_sensitive=False,
+    )
