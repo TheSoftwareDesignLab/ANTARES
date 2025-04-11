@@ -44,3 +44,41 @@ def test_add_ship_invalid_response(mocker):
     client = RestClient(base_url="http://localhost")
     with pytest.raises(SimulationError):
         client.add_ship(ship)
+
+
+def test_reset_simulation_http_error(mocker):
+    request = httpx.Request("POST", "http://localhost/simulation/reset")
+    response = httpx.Response(500, content=b"internal error", request=request)
+
+    mock_post = mocker.patch("httpx.post", return_value=response)
+
+    # .raise_for_status() triggers HTTPStatusError
+    def raise_error():
+        raise httpx.HTTPStatusError("error", request=request, response=response)
+
+    response.raise_for_status = raise_error
+
+    client = RestClient(base_url="http://localhost")
+
+    with pytest.raises(SimulationError) as exc:
+        client.reset_simulation()
+
+    assert "Reset failed" in str(exc.value)
+    mock_post.assert_called_once()
+
+
+def test_add_ship_request_error(mocker):
+    mocker.patch(
+        "httpx.post",
+        side_effect=httpx.RequestError(
+            "connection dropped", request=httpx.Request("POST", "http://localhost/simulation/ships")
+        ),
+    )
+
+    ship = ShipConfig(initial_position=(0, 0))
+    client = RestClient(base_url="http://localhost")
+
+    with pytest.raises(ConnectionError) as exc:
+        client.add_ship(ship)
+
+    assert "Could not reach Antares API" in str(exc.value)

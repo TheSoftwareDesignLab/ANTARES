@@ -38,3 +38,39 @@ async def test_subscribe_failure(monkeypatch):
     with pytest.raises(SubscriptionError):
         async for _ in subscriber.subscribe():
             pass
+
+
+@pytest.mark.asyncio
+async def test_subscribe_reconnects_on_failure(monkeypatch):
+    class OneMessageReader:
+        def __init__(self):
+            self.called = False
+
+        def at_eof(self):
+            return self.called
+
+        async def readline(self):
+            if not self.called:
+                self.called = True
+                return b'{"event": "recovered"}\n'
+            return b""
+
+    open_calls = []
+
+    async def fake_open_connection(host, port):
+        if not open_calls:
+            open_calls.append("fail")
+            raise ConnectionRefusedError("initial fail")
+        return OneMessageReader(), None
+
+    monkeypatch.setattr("asyncio.open_connection", fake_open_connection)
+    monkeypatch.setattr("asyncio.sleep", AsyncMock())
+
+    subscriber = TCPSubscriber("localhost", 1234, reconnect=True)
+
+    events = []
+    async for event in subscriber.subscribe():
+        events.append(event)
+        break  # Exit after one event
+
+    assert events == [{"event": "recovered"}]

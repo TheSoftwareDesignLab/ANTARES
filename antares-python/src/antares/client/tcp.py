@@ -1,8 +1,11 @@
 import asyncio
 import json
+import logging
 from collections.abc import AsyncIterator
 
 from antares.errors import SubscriptionError
+
+logger = logging.getLogger(__name__)
 
 
 class TCPSubscriber:
@@ -43,10 +46,13 @@ class TCPSubscriber:
                 asyncio.IncompleteReadError,
                 json.JSONDecodeError,
             ) as e:
-                raise SubscriptionError(f"Failed to read from TCP stream: {e}") from e
+                logger.error("TCP stream error: %s", e)
+                if not self.reconnect:
+                    raise SubscriptionError(f"Failed to read from TCP stream: {e}") from e
 
+            # Stop if not reconnecting
             if not self.reconnect:
                 break
 
-            # Wait before attempting to reconnect
+            logger.info("Waiting 1 second before retrying TCP connection...")
             await asyncio.sleep(1)
