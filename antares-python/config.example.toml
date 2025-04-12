@@ -1,0 +1,32 @@
+# ============================
+# Antares Simulation Config
+# Example TOML configuration
+# ============================
+
+[antares]
+host = "localhost"
+http_port = 9000
+tcp_port = 9001
+timeout = 5.0
+auth_token = ""
+
+# ============================
+# Ships to add at startup
+# ============================
+
+[[antares.ships.line]]
+initial_position = [0.0, 0.0]
+angle = 0.785                 # radians (approx. 45 degrees)
+speed = 5.0
+
+[[antares.ships.circle]]
+initial_position = [30.0, -30.0]
+radius = 20.0
+speed = 4.0
+
+[[antares.ships.random]]
+initial_position = [-20.0, 20.0]
+max_speed = 10.0
+
+[[antares.ships.stationary]]
+initial_position = [50.0, 50.0]
