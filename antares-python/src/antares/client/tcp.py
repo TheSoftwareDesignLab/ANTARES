@@ -4,6 +4,7 @@ import logging
 from collections.abc import AsyncIterator
 
 from antares.errors import SubscriptionError
+from antares.models.track import Track
 
 logger = logging.getLogger(__name__)
 
@@ -26,13 +27,13 @@ class TCPSubscriber:
         self.port = port
         self.reconnect = reconnect
 
-    async def subscribe(self) -> AsyncIterator[dict]:
+    async def subscribe(self) -> AsyncIterator[Track]:
         """
-        Connects to the TCP server and yields simulation events as parsed dictionaries.
+        Connects to the TCP server and yields simulation events as Track objects.
         This is an infinite async generator until disconnected or cancelled.
 
         Yields:
-            Parsed simulation events.
+            Parsed simulation events as Track objects.
         """
         while True:
             try:
@@ -40,11 +41,13 @@ class TCPSubscriber:
                 while not reader.at_eof():
                     line = await reader.readline()
                     if line:
-                        yield json.loads(line.decode())
+                        track = Track.from_csv_row(line.decode())
+                        yield track
             except (
                 ConnectionRefusedError,
                 asyncio.IncompleteReadError,
                 json.JSONDecodeError,
+                ValueError,
             ) as e:
                 logger.error("TCP stream error: %s", e)
                 if not self.reconnect:

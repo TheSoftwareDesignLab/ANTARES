@@ -1,6 +1,7 @@
 import asyncio
 import json
 import logging
+from typing import NoReturn
 
 import typer
 from rich.console import Console
@@ -15,7 +16,7 @@ app = typer.Typer(name="antares", help="Antares CLI for ship simulation", no_arg
 console = Console(theme=Theme({"info": "green", "warn": "yellow", "error": "bold red"}))
 
 
-def handle_error(message: str, code: int, json_output: bool = False):
+def handle_error(message: str, code: int, json_output: bool = False) -> NoReturn:
     logger = logging.getLogger("antares.cli")
     if json_output:
         typer.echo(json.dumps({"error": message}), err=True)
@@ -50,7 +51,7 @@ def reset(
     config: str = typer.Option(None),
     verbose: bool = typer.Option(False, "--verbose", "-v"),
     json_output: bool = typer.Option(False, "--json", help="Output in JSON format"),
-):
+) -> None:
     client = build_client(config, verbose, json_output)
     try:
         client.reset_simulation()
@@ -67,7 +68,7 @@ def add_ship(
     config: str = typer.Option(None, help="Path to the configuration file"),
     verbose: bool = typer.Option(False, "--verbose", "-v", help="Enable verbose output"),
     json_output: bool = typer.Option(False, "--json", help="Output in JSON format"),
-):
+) -> None:
     client = build_client(config, verbose, json_output)
     try:
         ship = ShipConfig(initial_position=(x, y))
@@ -84,13 +85,13 @@ def subscribe(
     verbose: bool = typer.Option(False, "--verbose", "-v"),
     json_output: bool = typer.Option(False, "--json", help="Output in JSON format"),
     log_file: str = typer.Option("antares.log", help="Path to log file"),
-):
+) -> None:
     setup_logging(log_file=log_file, level=logging.DEBUG if verbose else logging.INFO)
     logger = logging.getLogger("antares.cli")
 
     client = build_client(config, verbose, json_output)
 
-    async def _sub():
+    async def _sub() -> None:
         try:
             async for event in client.subscribe():
                 if json_output:

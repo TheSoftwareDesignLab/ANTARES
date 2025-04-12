@@ -1,36 +1,29 @@
 from collections.abc import AsyncIterator
+from typing import Any
 
 from antares.client.rest import RestClient
 from antares.client.tcp import TCPSubscriber
 from antares.config import AntaresSettings
 from antares.models.ship import ShipConfig
+from antares.models.track import Track
 
 
 class AntaresClient:
     def __init__(
         self,
-        base_url: str | None = None,
-        tcp_host: str | None = None,
-        tcp_port: int | None = None,
-        timeout: float | None = None,
-        auth_token: str | None = None,
+        **kwargs: Any,
     ) -> None:
         """
         Public interface for interacting with the Antares simulation engine.
         Accepts config overrides directly or falls back to environment-based configuration.
         """
 
-        overrides = {
-            "base_url": base_url,
-            "tcp_host": tcp_host,
-            "tcp_port": tcp_port,
-            "timeout": timeout,
-            "auth_token": auth_token,
-        }
-        clean_overrides = {k: v for k, v in overrides.items() if v is not None}
+        # Only include kwargs that match AntaresSettings fields
+        valid_fields = AntaresSettings.model_fields.keys()
+        filtered_kwargs = {k: v for k, v in kwargs.items() if k in valid_fields and v is not None}
 
         # Merge provided arguments with environment/.env via AntaresSettings
-        self._settings = AntaresSettings(**clean_overrides)
+        self._settings = AntaresSettings(**filtered_kwargs)
 
         self._rest = RestClient(
             base_url=self._settings.base_url,
@@ -51,12 +44,12 @@ class AntaresClient:
         """
         return self._rest.add_ship(ship)
 
-    async def subscribe(self) -> AsyncIterator[dict]:
+    async def subscribe(self) -> AsyncIterator[Track]:
         """
         Subscribes to live simulation data over TCP.
 
         Yields:
-            Parsed simulation event data as dictionaries.
+            Parsed simulation event data as Track objects.
         """
         async for event in self._tcp.subscribe():
             yield event
