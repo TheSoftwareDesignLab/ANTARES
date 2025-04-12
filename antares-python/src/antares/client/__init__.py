@@ -25,12 +25,16 @@ class AntaresClient:
         # Merge provided arguments with environment/.env via AntaresSettings
         self._settings = AntaresSettings(**filtered_kwargs)
 
+        base_url = f"http://{self._settings.host}:{self._settings.http_port}"
         self._rest = RestClient(
-            base_url=self._settings.base_url,
+            base_url=base_url,
             timeout=self._settings.timeout,
             auth_token=self._settings.auth_token,
         )
-        self._tcp = TCPSubscriber(host=self._settings.tcp_host, port=self._settings.tcp_port)
+        self._tcp = TCPSubscriber(
+            host=self._settings.host,
+            port=self._settings.tcp_port,
+        )
 
     def reset_simulation(self) -> None:
         """

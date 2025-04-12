@@ -1,6 +1,6 @@
 import httpx
 
-from antares.errors import ConnectionError, SimulationError
+from antares.errors import ConnectionError, ShipConfigError, SimulationError
 from antares.models.ship import ShipConfig
 
 
@@ -56,4 +56,4 @@ class RestClient:
         except httpx.RequestError as e:
             raise ConnectionError(f"Could not reach Antares API: {e}") from e
         except httpx.HTTPStatusError as e:
-            raise SimulationError(f"Add ship failed: {e.response.text}") from e
+            raise ShipConfigError(f"Add ship failed: {e.response.text}") from e

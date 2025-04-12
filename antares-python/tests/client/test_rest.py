@@ -2,7 +2,7 @@ import httpx
 import pytest
 
 from antares.client.rest import RestClient
-from antares.errors import ConnectionError, SimulationError
+from antares.errors import ConnectionError, ShipConfigError, SimulationError
 from antares.models.ship import ShipConfig
 
 
@@ -42,7 +42,7 @@ def test_add_ship_invalid_response(mocker):
     )
     ship = ShipConfig(initial_position=(0, 0))
     client = RestClient(base_url="http://localhost")
-    with pytest.raises(SimulationError):
+    with pytest.raises(ShipConfigError):
         client.add_ship(ship)
 
 

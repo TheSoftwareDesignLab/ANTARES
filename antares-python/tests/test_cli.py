@@ -1,4 +1,5 @@
 import asyncio
+import subprocess
 
 import pytest
 from typer.testing import CliRunner
@@ -14,8 +15,8 @@ def fake_config(tmp_path):
     config_file = tmp_path / "config.toml"
     config_file.write_text("""
 [antares]
-base_url = "http://test.local"
-tcp_host = "127.0.0.1"
+host = "localhost"
+http_port = 9000
 tcp_port = 9001
 timeout = 2.0
 auth_token = "fake-token"
@@ -134,3 +135,69 @@ def test_cli_subscribe_json(monkeypatch, fake_config):
 
     assert result.exit_code == 0
     assert '{"event": "test"}' in result.output
+
+
+def test_start_success(mocker):
+    mock_which = mocker.patch("shutil.which", return_value="/usr/local/bin/antares")
+    mock_popen = mocker.patch("subprocess.Popen", return_value=mocker.Mock(pid=1234))
+
+    result = runner.invoke(app, ["start"])
+    assert result.exit_code == 0
+    assert "Antares started in background with PID 1234" in result.output
+    mock_which.assert_called_once()
+    mock_popen.assert_called_once_with(
+        ["/usr/local/bin/antares"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+    )
+
+
+def test_start_executable_not_found(mocker):
+    mocker.patch("shutil.which", return_value=None)
+
+    result = runner.invoke(app, ["start", "--executable", "fake-antares"])
+    assert result.exit_code == 1
+    assert "Executable 'fake-antares' not found" in result.output
+
+
+def test_start_popen_failure(mocker):
+    mocker.patch("shutil.which", return_value="/usr/bin/antares")
+    mocker.patch("subprocess.Popen", side_effect=OSError("boom"))
+
+    result = runner.invoke(app, ["start"])
+    expected_exit_code = 2
+    assert result.exit_code == expected_exit_code
+    assert "Failed to start Antares" in result.output
+
+
+def test_start_popen_failure_with_json_verbose(mocker):
+    mocker.patch("shutil.which", return_value="/usr/bin/antares")
+    mocker.patch("subprocess.Popen", side_effect=OSError("boom"))
+
+    result = runner.invoke(app, ["start", "--json", "-v"])
+
+    expected_exit_code = 2
+    assert result.exit_code == expected_exit_code
+    assert '{"error":' in result.stdout or result.stderr
+    assert "Failed to start Antares: boom" in result.output
+
+
+def test_start_with_json_output(mocker):
+    mocker.patch("shutil.which", return_value="/usr/bin/antares")
+    mocker.patch("subprocess.Popen", return_value=mocker.Mock(pid=4321))
+
+    result = runner.invoke(app, ["start", "--json"])
+    assert result.exit_code == 0
+    assert '{"message":' in result.output
+    assert '"pid": 4321' in result.output
+
+
+def test_start_with_config(mocker):
+    mocker.patch("shutil.which", return_value="/usr/local/bin/antares")
+    mock_popen = mocker.patch("subprocess.Popen", return_value=mocker.Mock(pid=5678))
+
+    result = runner.invoke(app, ["start", "--config", "config.toml"])
+    assert result.exit_code == 0
+    mock_popen.assert_called_once_with(
+        ["/usr/local/bin/antares", "--config", "config.toml"],
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )

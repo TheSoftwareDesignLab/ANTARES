@@ -7,9 +7,9 @@ class AntaresSettings(BaseSettings):
     Supports environment variables and `.env` file loading.
     """
 
-    base_url: str = "http://localhost:8000"
-    tcp_host: str = "localhost"
-    tcp_port: int = 9000
+    host: str = "localhost"
+    http_port: int = 9000
+    tcp_port: int = 9001
     timeout: float = 5.0
     auth_token: str | None = None
 
