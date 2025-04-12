@@ -7,13 +7,15 @@ from pathlib import Path
 from typing import NoReturn
 
 import typer
+from pydantic import ValidationError
 from rich.console import Console
 from rich.theme import Theme
 
-from antares import AntaresClient, ShipConfig
+from antares import AntaresClient
 from antares.config_loader import load_config
 from antares.errors import ConnectionError, SimulationError, SubscriptionError
 from antares.logger import setup_logging
+from antares.models.ship import CircleShip, LineShip, RandomShip, ShipConfig, StationaryShip
 
 app = typer.Typer(name="antares-cli", help="Antares CLI for ship simulation", no_args_is_help=True)
 console = Console(theme=Theme({"info": "green", "warn": "yellow", "error": "bold red"}))
@@ -86,21 +88,45 @@ def reset(
 
 
 @app.command()
-def add_ship(
-    x: float = typer.Option(..., help="X coordinate of the ship"),
-    y: float = typer.Option(..., help="Y coordinate of the ship"),
+def add_ship(  # noqa: PLR0913
+    type: str = typer.Option(..., help="Type of ship: 'line', 'circle', 'random', or 'stationary'"),
+    x: float = typer.Option(..., help="Initial X coordinate of the ship"),
+    y: float = typer.Option(..., help="Initial Y coordinate of the ship"),
+    angle: float = typer.Option(None, help="(line) Movement angle in radians"),
+    speed: float = typer.Option(None, help="(line/circle) Constant speed"),
+    radius: float = typer.Option(None, help="(circle) Radius of the circular path"),
+    max_speed: float = typer.Option(None, help="(random) Maximum possible speed"),
     config: str = typer.Option(None, help="Path to the TOML configuration file"),
     verbose: bool = typer.Option(False, "--verbose", "-v", help="Enable verbose output"),
     json_output: bool = typer.Option(False, "--json", help="Output in JSON format"),
 ) -> None:
     """
-    Add a ship to the simulation with the specified parameters.
+    Add a ship to the simulation, specifying its motion pattern and parameters.
     """
     client = build_client(config, verbose, json_output)
+
+    base_args = {"initial_position": (x, y)}
+
+    ship: ShipConfig | None = None
     try:
-        ship = ShipConfig(initial_position=(x, y))
+        if type == "line":
+            ship = LineShip(**base_args, angle=angle, speed=speed)  # type: ignore[arg-type]
+        elif type == "circle":
+            ship = CircleShip(**base_args, radius=radius, speed=speed)  # type: ignore[arg-type]
+        elif type == "random":
+            ship = RandomShip(**base_args, max_speed=max_speed)  # type: ignore[arg-type]
+        elif type == "stationary":
+            ship = StationaryShip(**base_args)  # type: ignore[arg-type]
+        else:
+            raise ValueError(f"Invalid ship type: {type!r}")
+
+    except (ValidationError, ValueError, TypeError) as e:
+        handle_error(f"Invalid ship parameters: {e}", code=2, json_output=json_output)
+        return
+
+    try:
         client.add_ship(ship)
-        msg = f"🚢 Added ship at ({x}, {y})"
+        msg = f"🚢 Added {type} ship at ({x}, {y})"
         typer.echo(json.dumps({"message": msg}) if json_output else msg)
     except (ConnectionError, SimulationError) as e:
         handle_error(str(e), code=2, json_output=json_output)
