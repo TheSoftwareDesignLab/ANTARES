@@ -1,7 +1,7 @@
 import pytest
 
 from antares.client import AntaresClient
-from antares.models.ship import ShipConfig
+from antares.models.ship import StationaryShip
 
 
 def test_reset_simulation_delegates(mocker):
@@ -14,7 +14,7 @@ def test_reset_simulation_delegates(mocker):
 def test_add_ship_delegates(mocker):
     mock_add = mocker.patch("antares.client.rest.RestClient.add_ship")
     client = AntaresClient(base_url="http://localhost")
-    ship = ShipConfig(initial_position=(1.0, 2.0))
+    ship = StationaryShip(initial_position=(1.0, 2.0))
     client.add_ship(ship)
     mock_add.assert_called_once_with(ship)
 

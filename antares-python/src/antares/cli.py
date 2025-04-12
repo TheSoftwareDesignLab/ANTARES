@@ -122,7 +122,6 @@ def add_ship(  # noqa: PLR0913
 
     except (ValidationError, ValueError, TypeError) as e:
         handle_error(f"Invalid ship parameters: {e}", code=2, json_output=json_output)
-        return
 
     try:
         client.add_ship(ship)

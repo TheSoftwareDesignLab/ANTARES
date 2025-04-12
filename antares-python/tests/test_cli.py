@@ -32,11 +32,95 @@ def test_cli_reset(mocker, fake_config):
     mock_reset.assert_called_once()
 
 
-def test_cli_add_ship(mocker, fake_config):
+def test_cli_add_stationary_ship_success(mocker, fake_config):
     mock_add = mocker.patch("antares.client.rest.RestClient.add_ship")
-    result = runner.invoke(app, ["add-ship", "--x", "5.0", "--y", "6.0", "--config", fake_config])
+
+    result = runner.invoke(
+        app,
+        ["add-ship", "--type", "stationary", "--x", "5.0", "--y", "6.0", "--config", fake_config],
+    )
+
     assert result.exit_code == 0
-    assert "Added ship at (5.0, 6.0)" in result.output
+    assert "Added stationary ship at (5.0, 6.0)" in result.output
+    mock_add.assert_called_once()
+
+
+def test_cli_add_line_ship_success(mocker, fake_config):
+    mock_add = mocker.patch("antares.client.rest.RestClient.add_ship")
+
+    result = runner.invoke(
+        app,
+        [
+            "add-ship",
+            "--type",
+            "line",
+            "--x",
+            "10.0",
+            "--y",
+            "20.0",
+            "--angle",
+            "0.5",
+            "--speed",
+            "3.0",
+            "--config",
+            fake_config,
+        ],
+    )
+
+    assert result.exit_code == 0
+    assert "Added line ship at (10.0, 20.0)" in result.output
+    mock_add.assert_called_once()
+
+
+def test_cli_add_circle_ship_success(mocker, fake_config):
+    mock_add = mocker.patch("antares.client.rest.RestClient.add_ship")
+
+    result = runner.invoke(
+        app,
+        [
+            "add-ship",
+            "--type",
+            "circle",
+            "--x",
+            "30.0",
+            "--y",
+            "40.0",
+            "--radius",
+            "15.0",
+            "--speed",
+            "2.5",
+            "--config",
+            fake_config,
+        ],
+    )
+
+    assert result.exit_code == 0
+    assert "Added circle ship at (30.0, 40.0)" in result.output
+    mock_add.assert_called_once()
+
+
+def test_cli_add_random_ship_success(mocker, fake_config):
+    mock_add = mocker.patch("antares.client.rest.RestClient.add_ship")
+
+    result = runner.invoke(
+        app,
+        [
+            "add-ship",
+            "--type",
+            "random",
+            "--x",
+            "0.0",
+            "--y",
+            "0.0",
+            "--max-speed",
+            "12.0",
+            "--config",
+            fake_config,
+        ],
+    )
+
+    assert result.exit_code == 0
+    assert "Added random ship at (0.0, 0.0)" in result.output
     mock_add.assert_called_once()
 
 
@@ -82,10 +166,119 @@ def test_cli_add_ship_error_handling(mocker, fake_config):
     mocker.patch(
         "antares.client.rest.RestClient.add_ship", side_effect=SimulationError("ship rejected")
     )
-    result = runner.invoke(app, ["add-ship", "--x", "1", "--y", "2", "--config", fake_config])
+
+    result = runner.invoke(
+        app,
+        ["add-ship", "--type", "stationary", "--x", "1", "--y", "2", "--config", fake_config],
+    )
+
     expected_exit_code = 2
     assert result.exit_code == expected_exit_code
     assert "ship rejected" in result.output
+
+
+def test_cli_add_ship_invalid_type(mocker, fake_config):
+    result = runner.invoke(
+        app,
+        [
+            "add-ship",
+            "--type",
+            "invalid_type",
+            "--x",
+            "10.0",
+            "--y",
+            "20.0",
+            "--config",
+            fake_config,
+        ],
+    )
+
+    expected_exit_code = 2
+    assert result.exit_code == expected_exit_code
+    assert "Invalid ship type" in result.output
+
+
+def test_cli_add_stationary_ship_missing_args(fake_config):
+    result = runner.invoke(
+        app,
+        [
+            "add-ship",
+            "--type",
+            "stationary",
+            "--x",
+            "5.0",
+            "--config",
+            fake_config,
+        ],
+    )
+
+    expected_exit_code = 2
+    assert result.exit_code == expected_exit_code
+
+
+def test_cli_add_line_ship_missing_args(fake_config):
+    result = runner.invoke(
+        app,
+        [
+            "add-ship",
+            "--type",
+            "line",
+            "--x",
+            "10.0",
+            "--y",
+            "20.0",
+            "--config",
+            fake_config,
+        ],
+    )
+
+    expected_exit_code = 2
+    assert result.exit_code == expected_exit_code
+    assert "Invalid ship parameters" in result.output
+
+
+def test_cli_add_circle_missing_radius(mocker, fake_config):
+    result = runner.invoke(
+        app,
+        [
+            "add-ship",
+            "--type",
+            "circle",
+            "--x",
+            "10.0",
+            "--y",
+            "20.0",
+            "--speed",
+            "2.0",
+            "--config",
+            fake_config,
+        ],
+    )
+
+    expected_exit_code = 2
+    assert result.exit_code == expected_exit_code
+    assert "Invalid ship parameters" in result.output
+
+
+def test_cli_add_random_missing_max_speed(mocker, fake_config):
+    result = runner.invoke(
+        app,
+        [
+            "add-ship",
+            "--type",
+            "random",
+            "--x",
+            "0.0",
+            "--y",
+            "0.0",
+            "--config",
+            fake_config,
+        ],
+    )
+
+    expected_exit_code = 2
+    assert result.exit_code == expected_exit_code
+    assert "Invalid ship parameters" in result.output
 
 
 def test_cli_subscribe_error(monkeypatch, fake_config):

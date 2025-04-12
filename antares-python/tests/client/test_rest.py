@@ -3,7 +3,7 @@ import pytest
 
 from antares.client.rest import RestClient
 from antares.errors import ConnectionError, ShipConfigError, SimulationError
-from antares.models.ship import ShipConfig
+from antares.models.ship import CircleShip, LineShip, RandomShip
 
 
 def test_reset_simulation_success(mocker):
@@ -24,7 +24,7 @@ def test_reset_simulation_failure(mocker):
 def test_add_ship_success(mocker):
     mock_request = httpx.Request("POST", "http://localhost/simulation/ships")
     mock_post = mocker.patch("httpx.post", return_value=httpx.Response(200, request=mock_request))
-    ship = ShipConfig(initial_position=(0, 0))
+    ship = LineShip(initial_position=(0, 0), angle=0, speed=1)
     client = RestClient(base_url="http://localhost")
     client.add_ship(ship)
     mock_post.assert_called_once()
@@ -40,7 +40,7 @@ def test_add_ship_invalid_response(mocker):
             request=mock_request,
         ),
     )
-    ship = ShipConfig(initial_position=(0, 0))
+    ship = CircleShip(initial_position=(0, 0), radius=1, speed=1)
     client = RestClient(base_url="http://localhost")
     with pytest.raises(ShipConfigError):
         client.add_ship(ship)
@@ -75,7 +75,7 @@ def test_add_ship_request_error(mocker):
         ),
     )
 
-    ship = ShipConfig(initial_position=(0, 0))
+    ship = RandomShip(initial_position=(0, 0), max_speed=1)
     client = RestClient(base_url="http://localhost")
 
     with pytest.raises(ConnectionError) as exc:
