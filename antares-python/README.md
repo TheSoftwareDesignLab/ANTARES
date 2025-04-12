@@ -1,5 +1,10 @@
 # Antares Python Client
 
+[![CI](https://github.com/TheSoftwareDesignLab/ANTARES/actions/workflows/python-ci.yml/badge.svg)](https://github.com/TheSoftwareDesignLab/ANTARES/actions/workflows/python-ci.yml)
+[![codecov](https://img.shields.io/badge/coverage-100%25-brightgreen)](https://github.com/TheSoftwareDesignLab/ANTARES)
+[![PyPI version](https://img.shields.io/pypi/v/antares-python.svg)](https://pypi.org/project/antares-python/)
+[![License](https://img.shields.io/github/license/TheSoftwareDesignLab/ANTARES)](LICENSE)
+
 > ✨ A modern Python interface for the Antares simulation engine ✨
 
 Antares Python Client is a developer-friendly library and CLI tool that allows you to interact with the Antares simulation engine via HTTP and TCP protocols.
