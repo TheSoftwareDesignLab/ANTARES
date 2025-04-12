@@ -1,6 +1,6 @@
 [project]
 name = "antares-python"
-version = "0.1.0"
+version = "0.1.1"
 description = "Python interface for the Antares simulation software"
 authors = [
     { name = "Juan Sebastian Urrea-Lopez", email = "js.urrea@uniandes.edu.co" },

@@ -1,12 +1,12 @@
 # antares-python
 
-[![CI](https://github.com/ANTARES/antares-python/actions/workflows/python-ci.yml/badge.svg)](https://github.com/ANTARES/antares-python/actions/workflows/python-ci.yml)
-[![codecov](https://img.shields.io/badge/coverage-80%25-brightgreen)](https://github.com/ANTARES/antares-python)
+[![CI](https://github.com/TheSoftwareDesignLab/ANTARES/actions/workflows/python-ci.yml/badge.svg)](https://github.com/TheSoftwareDesignLab/ANTARES/actions/workflows/python-ci.yml)
+[![codecov](https://img.shields.io/badge/coverage-100%25-brightgreen)](https://github.com/TheSoftwareDesignLab/ANTARES)
 [![PyPI version](https://img.shields.io/pypi/v/antares-python.svg)](https://pypi.org/project/antares-python/)
 [![Python version](https://img.shields.io/pypi/pyversions/antares-python)](https://pypi.org/project/antares-python/)
-[![License](https://img.shields.io/github/license/ANTARES/antares-python)](LICENSE)
+[![License](https://img.shields.io/github/license/TheSoftwareDesignLab/ANTARES)](LICENSE)
 
-> Python interface for the [Antares](https://github.com/ANTARES/antares) simulation software
+> Python interface for the [Antares](https://github.com/TheSoftwareDesignLab/ANTARES) simulation software
 
 `antares-python` is a facade library that allows Python developers to interact with the Antares simulation engine via HTTP. It provides a clean, user-friendly API for submitting simulations, retrieving results, and managing scenarios — similar to how `pyspark` interfaces with Apache Spark.
 
