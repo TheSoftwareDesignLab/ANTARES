@@ -1,0 +1,49 @@
+name: Antares Python CI
+
+on:
+  push:
+    paths:
+      - 'antares-python/**'
+  pull_request:
+    paths:
+      - 'antares-python/**'
+
+jobs:
+  test:
+    name: Run Tests, Lint, Type-check
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: antares-python
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Install uv
+        run: |
+          curl -Ls https://astral.sh/uv/install.sh | bash
+          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+
+      - name: Install dependencies
+        run: |
+          uv pip install --system -e .
+          uv pip install --system pytest pytest-cov pytest-mock mypy ruff build
+        
+
+      - name: Run linters
+        run: python -m ruff check .
+
+      - name: Run formatters
+        run: python -m ruff format --check .
+
+      - name: Run mypy
+        run: mypy src/
+
+      - name: Run tests with coverage
+        run: pytest --cov=src --cov-report=term-missing --cov-fail-under=80
