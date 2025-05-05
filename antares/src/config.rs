@@ -12,3 +12,12 @@ pub struct Config {
     pub simulation: SimulationConfig,
     pub radar: RadarConfig,
 }
+
+impl Default for Config {
+    fn default() -> Self {
+        Self {
+            simulation: SimulationConfig::default(),
+            radar: RadarConfig::default(),
+        }
+    }
+}

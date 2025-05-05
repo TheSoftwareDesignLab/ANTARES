@@ -1,27 +1,34 @@
-use antares::ShipConfig;
-use antares::{Config, Controller};
+use antares::{Config, Controller, ShipConfig};
 use axum::{extract::State, routing::post, Json, Router};
-use std::{env, fs, net::SocketAddr, process, sync::Arc};
+use clap::Parser;
+use std::{fs, net::SocketAddr, process, sync::Arc};
 use tokio::task;
+
+#[derive(Parser)]
+#[command(author, version, about)]
+struct Args {
+    #[arg(long)]
+    config: Option<String>,
+}
 
 #[tokio::main]
 async fn main() {
-    let args: Vec<String> = env::args().collect();
+    let args = Args::parse();
 
-    if args.len() != 2 {
-        eprintln!("Usage: antares <config-file>");
-        process::exit(1);
-    }
+    let config = match args.config {
+        Some(path) => {
+            let content = fs::read_to_string(path).unwrap_or_else(|err| {
+                eprintln!("Problem reading the config file: {err}");
+                process::exit(1);
+            });
 
-    let config_content = fs::read_to_string(&args[1]).unwrap_or_else(|err| {
-        eprintln!("Problem reading the config file: {err}");
-        process::exit(1);
-    });
-
-    let config: Config = toml::from_str(&config_content).unwrap_or_else(|err| {
-        eprintln!("Problem parsing the config file: {err}");
-        process::exit(1);
-    });
+            toml::from_str(&content).unwrap_or_else(|err| {
+                eprintln!("Problem parsing the config file: {err}");
+                process::exit(1);
+            })
+        }
+        None => Config::default(),
+    };
 
     let controller_bind_addr = config.simulation.controller_bind_addr.clone();
     let controller = Arc::new(Controller::new(config));

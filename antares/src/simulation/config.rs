@@ -10,6 +10,16 @@ pub struct SimulationConfig {
     pub controller_bind_addr: String,
 }
 
+impl Default for SimulationConfig {
+    fn default() -> Self {
+        SimulationConfig {
+            emission_interval: 20,
+            initial_ships: Vec::new(),
+            controller_bind_addr: "0.0.0.0:17394".into(),
+        }
+    }
+}
+
 #[derive(Debug, Deserialize)]
 pub struct ShipConfig {
     pub initial_position: (f64, f64),

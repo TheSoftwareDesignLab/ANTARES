@@ -7,6 +7,16 @@ pub struct RadarConfig {
     pub bind_addr: String,
 }
 
+impl Default for RadarConfig {
+    fn default() -> Self {
+        RadarConfig {
+            detector: DetectorConfig::default(),
+            broadcast: BroadcastConfig::default(),
+            bind_addr: "0.0.0.0:17396".into(),
+        }
+    }
+}
+
 #[derive(Debug, Deserialize, Clone)]
 pub struct DetectorConfig {
     pub range: f64,
@@ -15,9 +25,26 @@ pub struct DetectorConfig {
     pub start_coordinates: (f64, f64),
 }
 
+impl Default for DetectorConfig {
+    fn default() -> Self {
+        DetectorConfig {
+            range: 1000.0,
+            speed: 0.0,
+            angle: 0.0,
+            start_coordinates: (4.0, -72.0),
+        }
+    }
+}
+
 #[derive(Debug, Deserialize)]
 #[serde(tag = "type", rename_all = "lowercase")]
 pub enum BroadcastConfig {
     Tcp,
     WebSocket,
+}
+
+impl Default for BroadcastConfig {
+    fn default() -> Self {
+        BroadcastConfig::Tcp
+    }
 }
