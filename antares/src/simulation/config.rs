@@ -1,40 +1,45 @@
+use super::{
+    CircleMovement, LineMovement, MovementStrategy, RandomMovement, Ship, StationaryMovement,
+};
 use serde::Deserialize;
 
 #[derive(Debug, Deserialize)]
 pub struct SimulationConfig {
     pub emission_interval: u64,
-    pub ships: ShipsConfig,
+    pub initial_ships: Vec<ShipConfig>,
+    pub controller_bind_addr: String,
 }
 
 #[derive(Debug, Deserialize)]
-pub struct ShipsConfig {
-    pub line: Vec<LineMovementConfig>,
-    pub circle: Vec<CircleMovementConfig>,
-    pub random: Vec<RandomMovementConfig>,
-    pub stationary: Vec<StationaryMovementConfig>,
-}
-
-#[derive(Debug, Deserialize)]
-pub struct LineMovementConfig {
+pub struct ShipConfig {
     pub initial_position: (f64, f64),
-    pub angle: f64,
-    pub speed: f64,
+    #[serde(flatten)]
+    pub movement: MovementType,
 }
 
 #[derive(Debug, Deserialize)]
-pub struct CircleMovementConfig {
-    pub initial_position: (f64, f64),
-    pub radius: f64,
-    pub speed: f64,
+#[serde(tag = "type", rename_all = "lowercase")]
+pub enum MovementType {
+    Line { angle: f64, speed: f64 },
+    Circle { radius: f64, speed: f64 },
+    Random { max_speed: f64 },
+    Stationary,
 }
 
-#[derive(Debug, Deserialize)]
-pub struct RandomMovementConfig {
-    pub initial_position: (f64, f64),
-    pub max_speed: f64,
-}
+pub fn build_ship_from_config(id: u64, config: ShipConfig, emission_interval: u64) -> Ship {
+    let movement_strategy: Box<dyn MovementStrategy> = match config.movement {
+        MovementType::Line { angle, speed } => Box::new(LineMovement::new(angle, speed)),
+        MovementType::Circle { radius, speed } => {
+            Box::new(CircleMovement::new(radius, speed, emission_interval))
+        }
+        MovementType::Random { max_speed } => Box::new(RandomMovement::new(max_speed)),
+        MovementType::Stationary => Box::new(StationaryMovement {}),
+    };
 
-#[derive(Debug, Deserialize)]
-pub struct StationaryMovementConfig {
-    pub initial_position: (f64, f64),
+    Ship {
+        id,
+        position: config.initial_position,
+        emission_interval,
+        movement_strategy,
+    }
 }

@@ -1,7 +1,11 @@
+use antares::ShipConfig;
 use antares::{Config, Controller};
-use std::{env, fs, process};
+use axum::{extract::State, routing::post, Json, Router};
+use std::{env, fs, net::SocketAddr, process, sync::Arc};
+use tokio::task;
 
-fn main() {
+#[tokio::main]
+async fn main() {
     let args: Vec<String> = env::args().collect();
 
     if args.len() != 2 {
@@ -19,6 +23,31 @@ fn main() {
         process::exit(1);
     });
 
-    let controller = Controller::new(config);
-    controller.run();
+    let controller_bind_addr = config.simulation.controller_bind_addr.clone();
+    let controller = Arc::new(Controller::new(config));
+
+    let controller_clone = Arc::clone(&controller);
+    task::spawn(async move {
+        controller_clone.run().await;
+    });
+
+    let app = Router::new()
+        .route("/simulation/reset", post(reset_simulation))
+        .route("/simulation/ships", post(add_ship))
+        .with_state(controller);
+
+    let addr: SocketAddr = controller_bind_addr.parse().unwrap();
+    let listener = tokio::net::TcpListener::bind(&addr).await.unwrap();
+    println!("🚢 Controller server running on {addr}");
+    axum::serve(listener, app.into_make_service())
+        .await
+        .unwrap();
+}
+
+async fn reset_simulation(State(controller): State<Arc<Controller>>) {
+    controller.reset_simulation();
+}
+
+async fn add_ship(State(controller): State<Arc<Controller>>, Json(payload): Json<ShipConfig>) {
+    controller.add_ship(payload);
 }

@@ -4,6 +4,7 @@ use serde::Deserialize;
 pub struct RadarConfig {
     pub detector: DetectorConfig,
     pub broadcast: BroadcastConfig,
+    pub bind_addr: String,
 }
 
 #[derive(Debug, Deserialize, Clone)]
@@ -17,6 +18,6 @@ pub struct DetectorConfig {
 #[derive(Debug, Deserialize)]
 #[serde(tag = "type", rename_all = "lowercase")]
 pub enum BroadcastConfig {
-    Tcp { bind_addr: String },
-    WebSocket { bind_addr: String },
+    Tcp,
+    WebSocket,
 }

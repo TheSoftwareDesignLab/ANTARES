@@ -9,11 +9,12 @@ mod environment;
 mod movement;
 mod simulation;
 
-use emitters::Emitter;
+use config::build_ship_from_config;
+use emitters::{Emitter, Ship};
 use movement::{
     CircleMovement, LineMovement, MovementStrategy, RandomMovement, StationaryMovement,
 };
 
-pub use config::SimulationConfig;
+pub use config::{ShipConfig, SimulationConfig};
 pub use environment::Wave;
 pub use simulation::Simulation;

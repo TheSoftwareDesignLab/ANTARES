@@ -13,7 +13,7 @@ impl Radar {
         Self { config }
     }
 
-    pub async fn start(self, wave_receiver: mpsc::Receiver<Wave>) {
+    pub async fn start(&self, wave_receiver: mpsc::Receiver<Wave>) {
         let (plot_sender, plot_receiver) = mpsc::channel(100);
         let (track_sender, mut track_receiver) = mpsc::channel(100);
 
@@ -22,9 +22,9 @@ impl Radar {
         Tracker::start(plot_receiver, track_sender);
 
         let broadcaster: Arc<dyn Broadcaster> = match &self.config.broadcast {
-            BroadcastConfig::Tcp { bind_addr } => Arc::new(TcpBroadcaster::new(bind_addr.clone())),
-            BroadcastConfig::WebSocket { bind_addr } => {
-                Arc::new(WebSocketBroadcaster::new(bind_addr.clone()))
+            BroadcastConfig::Tcp => Arc::new(TcpBroadcaster::new(self.config.bind_addr.clone())),
+            BroadcastConfig::WebSocket => {
+                Arc::new(WebSocketBroadcaster::new(self.config.bind_addr.clone()))
             }
         };
 

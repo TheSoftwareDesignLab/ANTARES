@@ -13,3 +13,4 @@ use simulation::{Simulation, SimulationConfig, Wave};
 
 pub use config::Config;
 pub use controller::Controller;
+pub use simulation::ShipConfig;
