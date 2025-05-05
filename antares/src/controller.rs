@@ -4,7 +4,7 @@
 //!
 
 use super::{Config, Radar, Simulation};
-use std::sync::mpsc::channel;
+use tokio::sync::mpsc;
 
 pub struct Controller {
     radar: Radar,
@@ -19,10 +19,15 @@ impl Controller {
         }
     }
 
-    pub fn run(self) {
-        let (wave_sender, wave_receiver) = channel();
-        self.simulation.start(wave_sender);
-        self.radar.start(wave_receiver);
-        loop {}
+    pub async fn run(self) {
+        let (wave_sender, wave_receiver) = mpsc::channel(100);
+        let Controller { radar, simulation } = self;
+
+        tokio::spawn(simulation.start(wave_sender));
+        tokio::spawn(radar.start(wave_receiver));
+
+        tokio::signal::ctrl_c()
+            .await
+            .expect("failed to listen for Ctrl+C");
     }
 }

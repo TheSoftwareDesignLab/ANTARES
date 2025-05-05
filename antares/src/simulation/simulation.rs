@@ -1,12 +1,12 @@
 use crate::simulation::emitters::Ship;
 use std::time::Duration;
+use tokio::sync::mpsc::Sender;
+use tokio::time::interval;
 
 use super::{
     CircleMovement, Emitter, LineMovement, RandomMovement, SimulationConfig, StationaryMovement,
     Wave,
 };
-use std::sync::mpsc::Sender;
-use std::thread;
 
 pub struct Simulation {
     config: SimulationConfig,
@@ -14,79 +14,82 @@ pub struct Simulation {
 
 impl Simulation {
     /// Create a new Simulation.
-    pub fn new(config: SimulationConfig) -> Simulation {
-        Simulation { config }
+    pub fn new(config: SimulationConfig) -> Self {
+        Self { config }
     }
 
-    /// Start the simulation.
-    pub fn start(&self, wave_sender: Sender<Wave>) {
-        let emission_interval = self.config.emission_interval;
+    /// Start the simulation (spawns a Tokio task).
+    pub async fn start(self, wave_sender: Sender<Wave>) {
+        let emission_interval = Duration::from_millis(self.config.emission_interval);
+        let ships = Self::build_ships(self.config);
+
+        tokio::spawn(async move {
+            let mut ticker = interval(emission_interval);
+            let mut ships = ships;
+
+            loop {
+                ticker.tick().await;
+
+                let waves: Vec<Wave> = ships
+                    .iter_mut()
+                    .map(|ship| {
+                        let wave = ship.emit();
+                        ship.update();
+                        wave
+                    })
+                    .collect();
+
+                for wave in waves {
+                    if wave_sender.send(wave).await.is_err() {
+                        // Receiver dropped; end simulation task
+                        break;
+                    }
+                }
+            }
+        });
+    }
+
+    fn build_ships(config: SimulationConfig) -> Vec<Ship> {
         let mut ships = Vec::new();
         let mut ship_id = 0;
+        let emission_interval = config.emission_interval;
 
-        // Create ships with line movement
-        for line_ship in &self.config.ships.line {
-            let movement_strategy = Box::new(LineMovement::new(line_ship.angle, line_ship.speed));
+        // Helper closure to push ships
+        let mut push_ship = |position, movement_strategy| {
             ships.push(Ship {
                 id: ship_id,
-                position: line_ship.initial_position,
+                position,
                 emission_interval,
                 movement_strategy,
             });
             ship_id += 1;
+        };
+
+        for s in &config.ships.line {
+            push_ship(
+                s.initial_position,
+                Box::new(LineMovement::new(s.angle, s.speed)),
+            );
         }
 
-        // Create ships with circle movement
-        for circle_ship in &self.config.ships.circle {
-            let movement_strategy = Box::new(CircleMovement::new(
-                circle_ship.radius,
-                circle_ship.speed,
-                emission_interval,
-            ));
-            ships.push(Ship {
-                id: ship_id,
-                position: circle_ship.initial_position,
-                emission_interval,
-                movement_strategy,
-            });
-            ship_id += 1;
+        for s in &config.ships.circle {
+            push_ship(
+                s.initial_position,
+                Box::new(CircleMovement::new(s.radius, s.speed, emission_interval)),
+            );
         }
 
-        // Create ships with random movement
-        for random_ship in &self.config.ships.random {
-            let movement_strategy = Box::new(RandomMovement::new(random_ship.max_speed));
-            ships.push(Ship {
-                id: ship_id,
-                position: random_ship.initial_position,
-                emission_interval,
-                movement_strategy,
-            });
-            ship_id += 1;
+        for s in &config.ships.random {
+            push_ship(
+                s.initial_position,
+                Box::new(RandomMovement::new(s.max_speed)),
+            );
         }
 
-        // Create ships with stationary movement
-        for stationary_ship in &self.config.ships.stationary {
-            let movement_strategy = Box::new(StationaryMovement {});
-            ships.push(Ship {
-                id: ship_id,
-                position: stationary_ship.initial_position,
-                emission_interval,
-                movement_strategy,
-            });
-            ship_id += 1;
+        for s in &config.ships.stationary {
+            push_ship(s.initial_position, Box::new(StationaryMovement {}));
         }
 
-        thread::spawn(move || loop {
-            let mut waves = Vec::with_capacity(ships.len());
-            for ship in ships.iter_mut() {
-                let wave = ship.emit();
-                waves.push(wave);
-                ship.update();
-            }
-            for wave in waves {
-                wave_sender.send(wave).expect("Failed to send wave");
-            }
-            thread::sleep(Duration::from_millis(emission_interval));
-        });
+        ships
     }
 }

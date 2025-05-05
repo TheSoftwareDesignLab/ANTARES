@@ -1,17 +1,17 @@
 use super::{Plot, Track};
 use chrono::{Datelike, Timelike};
 use std::collections::HashMap;
-use std::sync::mpsc;
-use std::thread;
+use tokio::sync::mpsc::{Receiver, Sender};
+use tokio::task;
 
 pub struct Tracker;
 
 impl Tracker {
-    pub fn start(plot_receiver: mpsc::Receiver<Plot>, track_sender: mpsc::Sender<Track>) {
-        thread::spawn(move || {
+    pub fn start(mut plot_receiver: Receiver<Plot>, track_sender: Sender<Track>) {
+        task::spawn(async move {
             let mut last_plot_by_id = HashMap::new();
-            loop {
-                let plot = plot_receiver.recv().expect("Failed to receive plot");
+
+            while let Some(plot) = plot_receiver.recv().await {
                 let (speed, course) = if let Some(last_plot) = last_plot_by_id.get(&plot.id) {
                     Tracker::calculate_speed_vector(last_plot, &plot)
                 } else {
@@ -45,7 +45,12 @@ impl Tracker {
                     winazw: 0.0,
                     stderr: 0.0,
                 };
-                track_sender.send(track).unwrap();
+
+                if track_sender.send(track).await.is_err() {
+                    eprintln!("Track sender dropped");
+                    break;
+                }
+
                 last_plot_by_id.insert(plot.id, plot);
             }
         });

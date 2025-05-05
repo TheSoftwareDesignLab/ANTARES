@@ -1,9 +1,8 @@
-use crate::radar::config::DetectorConfig;
-
+use super::super::DetectorConfig;
 use super::{Plot, Wave};
 use chrono::{DateTime, Utc};
-use std::sync::mpsc::{Receiver, Sender};
-use std::thread;
+use tokio::sync::mpsc::{Receiver, Sender};
+use tokio::task;
 
 pub struct Detector {
     pub range: f64,
@@ -24,9 +23,9 @@ impl Detector {
         }
     }
 
-    pub fn start(self, wave_receiver: Receiver<Wave>, plot_sender: Sender<Plot>) {
-        thread::spawn(move || loop {
-            for wave in wave_receiver.iter() {
+    pub fn start(self, mut wave_receiver: Receiver<Wave>, plot_sender: Sender<Plot>) {
+        task::spawn(async move {
+            while let Some(wave) = wave_receiver.recv().await {
                 let (range, azimuth) = self.calculate_range_azimuth(&wave);
                 if range > self.range {
                     continue;
@@ -41,7 +40,10 @@ impl Detector {
                     latitude,
                     longitude,
                 };
-                plot_sender.send(plot).unwrap();
+                if plot_sender.send(plot).await.is_err() {
+                    eprintln!("Plot sender dropped");
+                    break;
+                }
             }
         });
     }
