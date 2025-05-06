@@ -33,10 +33,6 @@ impl Controller {
         tokio::spawn(async move {
             radar.start(wave_receiver).await;
         });
-
-        tokio::signal::ctrl_c()
-            .await
-            .expect("failed to listen for Ctrl+C");
     }
 
     pub fn reset_simulation(&self) {

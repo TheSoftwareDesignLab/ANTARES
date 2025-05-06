@@ -2,7 +2,6 @@ use antares::{Config, Controller, ShipConfig};
 use axum::{extract::State, routing::post, Json, Router};
 use clap::Parser;
 use std::{fs, net::SocketAddr, process, sync::Arc};
-use tokio::task;
 
 #[derive(Parser)]
 #[command(author, version, about)]
@@ -33,10 +32,7 @@ async fn main() {
     let controller_bind_addr = config.simulation.controller_bind_addr.clone();
     let controller = Arc::new(Controller::new(config));
 
-    let controller_clone = Arc::clone(&controller);
-    task::spawn(async move {
-        controller_clone.run().await;
-    });
+    controller.run().await;
 
     let app = Router::new()
         .route("/simulation/reset", post(reset_simulation))
@@ -46,9 +42,17 @@ async fn main() {
     let addr: SocketAddr = controller_bind_addr.parse().unwrap();
     let listener = tokio::net::TcpListener::bind(&addr).await.unwrap();
     println!("🚢 Controller server running on {addr}");
-    axum::serve(listener, app.into_make_service())
-        .await
-        .unwrap();
+
+    tokio::select! {
+        result = axum::serve(listener, app.into_make_service()) => {
+            if let Err(err) = result {
+                eprintln!("Server error: {err}");
+            }
+        }
+        _ = tokio::signal::ctrl_c() => {
+            println!("🛑 Received Ctrl+C, shutting down...");
+        }
+    }
 }
 
 async fn reset_simulation(State(controller): State<Arc<Controller>>) {
