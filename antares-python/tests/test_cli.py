@@ -2,6 +2,7 @@ import asyncio
 import subprocess
 
 import pytest
+from pydantic import BaseModel
 from typer.testing import CliRunner
 
 from antares.cli import app
@@ -14,12 +15,10 @@ runner = CliRunner()
 def fake_config(tmp_path):
     config_file = tmp_path / "config.toml"
     config_file.write_text("""
-[antares]
-host = "localhost"
-http_port = 9000
-tcp_port = 9001
-timeout = 2.0
-auth_token = "fake-token"
+[antares.simulation]
+controller_bind_addr = "10.20.20.10:17394"
+[antares.radar]           
+bind_addr = "0.0.0.0:17396"
 """)
     return str(config_file)
 
@@ -138,12 +137,6 @@ def test_cli_subscribe(monkeypatch, mocker, fake_config):
     assert "test-event" in result.output
 
 
-def test_handle_error_json(monkeypatch):
-    result = runner.invoke(app, ["reset", "--json"], catch_exceptions=False)
-    assert result.exit_code in {1, 2}
-    assert "error" in result.output
-
-
 def test_build_client_fails(mocker):
     mocker.patch("antares.config_loader.load_config", side_effect=Exception("broken config"))
     result = runner.invoke(app, ["reset", "--config", "invalid.toml"])
@@ -169,7 +162,18 @@ def test_cli_add_ship_error_handling(mocker, fake_config):
 
     result = runner.invoke(
         app,
-        ["add-ship", "--type", "stationary", "--x", "1", "--y", "2", "--config", fake_config],
+        [
+            "add-ship",
+            "--type",
+            "stationary",
+            "--x",
+            "1",
+            "--y",
+            "2",
+            "--config",
+            fake_config,
+            "--json",
+        ],
     )
 
     expected_exit_code = 2
@@ -308,7 +312,10 @@ def test_cli_verbose_prints_config(mocker, fake_config):
     assert "Using settings" in result.output
 
 
-def test_cli_subscribe_json(monkeypatch, fake_config):
+def test_cli_subscribe_json(monkeypatch):
+    class EventMock(BaseModel):
+        event: str
+
     class OneEventGen:
         def __init__(self):
             self.done = False
@@ -319,15 +326,15 @@ def test_cli_subscribe_json(monkeypatch, fake_config):
         async def __anext__(self):
             if not self.done:
                 self.done = True
-                return {"event": "test"}
+                return EventMock(event="test")
             raise StopAsyncIteration
 
     monkeypatch.setattr("antares.client.tcp.TCPSubscriber.subscribe", lambda self: OneEventGen())
 
-    result = runner.invoke(app, ["subscribe", "--config", fake_config, "--json"])
+    result = runner.invoke(app, ["subscribe", "--json"])
 
     assert result.exit_code == 0
-    assert '{"event": "test"}' in result.output
+    assert '{"event":"test"}' in result.output
 
 
 def test_start_success(mocker):

@@ -17,4 +17,7 @@ def load_config(path: str | Path | None = None) -> AntaresSettings:
     with config_path.open("rb") as f:
         data = tomli.load(f)
 
-    return AntaresSettings(**data.get("antares", {}))
+    return AntaresSettings(
+        controller_bind_addr=data.get("antares.simulation.controller_bind_addr", "0.0.0.0:17394"),
+        radar_bind_addr=data.get("antares.simulation.radar_bind_addr", "0.0.0.0:17396"),
+    )
