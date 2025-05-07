@@ -1,7 +1,6 @@
 ---
-layout: default
-title: ANTARES
-permalink: /
+layout: page
+toc: true
 ---
 
 ANTARES is an open-source, software-based naval radar simulator. ANTARES is designed for seamless integration with other systems via the TCP protocol while also supporting standalone operation through a Graphical User Interface (GUI). It adheres to the open-closed design principle, facilitating easy extensibility with new simulation entities, such as naval vessel movement strategies. The simulator is implemented using the Rust programming language due to its advantages in performance, type safety, concurrency, and memory safety.
