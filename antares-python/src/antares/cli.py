@@ -150,9 +150,9 @@ def subscribe(
         try:
             async for event in client.subscribe():
                 if json_output:
-                    typer.echo(json.dumps(event))
+                    typer.echo(event.model_dump_json())
                 else:
-                    console.print_json(data=event)
+                    console.print(f"[info]Received event: {event}")
                 logger.debug("Received event: %s", event)
         except SubscriptionError as e:
             handle_error(str(e), code=3, json_output=json_output)
@@ -183,11 +183,9 @@ def build_client(config_path: str | None, verbose: bool, json_output: bool) -> A
         if verbose:
             console.print(f"[info]Using settings: {settings.model_dump()}")
         return AntaresClient(
-            host=settings.host,
-            http_port=settings.http_port,
-            tcp_port=settings.tcp_port,
+            controller_bind_addr=settings.controller_bind_addr,
+            radar_bind_addr=settings.radar_bind_addr,
             timeout=settings.timeout,
-            auth_token=settings.auth_token,
         )
     except Exception as e:
         handle_error(f"Failed to load configuration: {e}", code=1, json_output=json_output)

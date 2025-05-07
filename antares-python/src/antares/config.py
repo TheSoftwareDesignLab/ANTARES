@@ -7,11 +7,9 @@ class AntaresSettings(BaseSettings):
     Supports environment variables and `.env` file loading.
     """
 
-    host: str = "localhost"
-    http_port: int = 9000
-    tcp_port: int = 9001
+    controller_bind_addr: str = "0.0.0.0:17394"
+    radar_bind_addr: str = "0.0.0.0:17396"
     timeout: float = 5.0
-    auth_token: str | None = None
 
     model_config = SettingsConfigDict(
         env_file=".env",

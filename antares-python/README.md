@@ -115,7 +115,7 @@ async def main():
     async for event in client.subscribe():
         if isinstance(event, Track):
             print(
-                f"📍 Track #{event.id} - {event.name} at ({event.lat}, {event.long}) → {event.speed} knots"
+                f"📍 Track #{event.id} - {event.name} at ({event.lat}, {event.long}) → {event.speed} m/s"
             )
 
 
@@ -157,11 +157,9 @@ The client supports two configuration methods:
 The `.env` file allows you to define environment variables:
 
 ```dotenv
-ANTARES_HOST=localhost
-ANTARES_HTTP_PORT=9000
-ANTARES_TCP_PORT=9001
+ANTARES_CONTROLLER_BIND_ADDR=0.0.0.0:17394
+ANTARES_RADAR_BIND_ADDR=0.0.0.0:17396
 ANTARES_TIMEOUT=5.0
-ANTARES_AUTH_TOKEN=
 ```
 
 ➡️ See `template.env` for a complete example.
@@ -171,29 +169,42 @@ ANTARES_AUTH_TOKEN=
 To configure the client and ships via a TOML file:
 
 ```toml
-[antares]
-host = "localhost"
-http_port = 9000
-tcp_port = 9001
-timeout = 5.0
-auth_token = ""
+[antares.radar]
+bind_addr = "0.0.0.0:17396"
 
-[[antares.ships.stationary]]
-initial_position = [50.0, 50.0]
+[antares.radar.detector]
+range = 1000.0
+speed = 0.0
+angle = 0.0
+start_coordinates = [4.0, -72.0]
 
-[[antares.ships.random]]
-initial_position = [-20.0, 20.0]
-max_speed = 10.0
+[antares.radar.broadcast]
+type = "tcp"
 
-[[antares.ships.circle]]
+[antares.simulation]
+emission_interval = 20
+controller_bind_addr = "0.0.0.0:17394"
+
+[[antares.simulation.initial_ships]]
+type = "line"
+initial_position = [0.0, 0.0]
+angle = 0.785
+speed = 5.0
+
+[[antares.simulation.initial_ships]]
+type = "circle"
 initial_position = [30.0, -30.0]
 radius = 20.0
 speed = 4.0
 
-[[antares.ships.line]]
-initial_position = [0.0, 0.0]
-angle = 0.785
-speed = 5.0
+[[antares.simulation.initial_ships]]
+type = "random"
+initial_position = [-20.0, 20.0]
+max_speed = 10.0
+
+[[antares.simulation.initial_ships]]
+type = "stationary"
+initial_position = [50.0, 50.0]
 ```
 
 ➡️ See `config.example.toml` for a full working example.

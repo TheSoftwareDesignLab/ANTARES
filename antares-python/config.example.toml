@@ -1,32 +1,48 @@
 # ============================
 # Antares Simulation Config
-# Example TOML configuration
 # ============================
 
-[antares]
-host = "localhost"
-http_port = 9000
-tcp_port = 9001
-timeout = 5.0
-auth_token = ""
+[antares.simulation]
+emission_interval = 20
+controller_bind_addr = "0.0.0.0:17394"
 
 # ============================
 # Ships to add at startup
 # ============================
 
-[[antares.ships.line]]
+[[antares.simulation.initial_ships]]
+type = "line"
 initial_position = [0.0, 0.0]
 angle = 0.785                 # radians (approx. 45 degrees)
 speed = 5.0
 
-[[antares.ships.circle]]
+[[antares.simulation.initial_ships]]
+type = "circle"
 initial_position = [30.0, -30.0]
 radius = 20.0
 speed = 4.0
 
-[[antares.ships.random]]
+[[antares.simulation.initial_ships]]
+type = "random"
 initial_position = [-20.0, 20.0]
 max_speed = 10.0
 
-[[antares.ships.stationary]]
+[[antares.simulation.initial_ships]]
+type = "stationary"
 initial_position = [50.0, 50.0]
+
+# ============================
+# Antares Radar Config
+# ============================
+
+[antares.radar]
+bind_addr = "0.0.0.0:17396"
+
+[antares.radar.detector]
+range = 1000.0
+speed = 0.0
+angle = 0.0
+start_coordinates = [4.0, -72.0]
+
+[antares.radar.broadcast]
+type = "tcp"

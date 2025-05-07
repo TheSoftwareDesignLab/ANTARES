@@ -11,13 +11,7 @@ async def main() -> None:
     """
 
     # Initialize the Antares client
-    client = AntaresClient(
-        host="localhost",
-        http_port=9000,
-        tcp_port=9001,
-        timeout=5.0,
-        auth_token="my_secret_auth_token",
-    )
+    client = AntaresClient()
 
     # Add ships
     ships = [
@@ -36,7 +30,7 @@ async def main() -> None:
     try:
         async for track in client.subscribe():
             print(
-                f"📍 Track #{track.id} - {track.name} @ ({track.lat}, {track.long}) → {track.speed} knots"  # noqa: E501
+                f"📍 Track #{track.id} - {track.name} @ ({track.lat}, {track.long}) → {track.speed} m/s"  # noqa: E501
             )
     except KeyboardInterrupt:
         print("\n🛑 Subscription interrupted by user.")
