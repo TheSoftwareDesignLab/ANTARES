@@ -4,6 +4,16 @@
 
 ## Getting Started
 
+### ANTARES
+
+To run the Antares Web application, you need to have the ANTARES simulation server running. You can find the instructions for setting up the ANTARES server in the [ANTARES documentation](https://thesoftwaredesignlab.github.io/ANTARES/antares).
+
+It is important to configure the ANTARES server to use WebSocket for communication. This is typically done by setting the option `antares.radar.broadcast.type` to `websocket` in the ANTARES configuration file. An example configuration file is provided in the `config.example.toml` file in this repository. To run the ANTARES server with this configuration, you can use the following command:
+
+```bash
+antares --config config.example.toml
+```
+
 ### Installation
 
 ```bash
@@ -49,6 +59,10 @@ For demos, videos, and more information about the platform and its capabilities,
 
 If you are interested in contributing or exploring the rest of the ANTARES simulation stack, check out the full monorepo:
 👉 [https://github.com/TheSoftwareDesignLab/ANTARES](https://github.com/TheSoftwareDesignLab/ANTARES)
+
+## License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
 ## Credits
 
