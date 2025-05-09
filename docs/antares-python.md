@@ -1,9 +1,9 @@
 ---
 order: 3
-icon: fas fa-terminal
-title: antares-cli
+icon: fas fa-robot
+title: Antares Python Client
 description: >-
-  A command-line interface for prototyping, commanding, and collecting data from Antares simulations.
+  A high-level Python library for integrating Antares simulations into real-time AI, control, and monitoring systems.
 ---
 
 ## 🧠 What is the Antares Python Client?
@@ -11,8 +11,6 @@ description: >-
 The **Antares Python Client** is a high-level, developer-friendly library that allows you to interact with the **Antares simulation engine** directly from Python. Designed for modern simulation workflows, it provides a seamless interface to control simulations, add dynamic entities (like ships), and stream simulation events in real time.
 
 Whether you're prototyping autonomous decision-making systems, testing radar algorithms, or integrating simulations into command dashboards, `antares-python` makes it possible - and remarkably simple.
-
----
 
 ## ⚙️ Why Python?
 
@@ -24,8 +22,6 @@ Python is the language of choice for:
 - **Algorithm prototyping** (e.g., sensor fusion, trajectory prediction)
 
 With `antares-python`, you can embed Rust-powered realistic, high-frequency maritime simulations directly into those environments — enabling closed-loop testing, ML training, or control logic validation at scale.
-
----
 
 ## 📦 Python Integration in 30 Seconds
 
@@ -49,8 +45,6 @@ async for track in client.subscribe():
 
 ➡️ *Spawn a ship and react to its telemetry in real time. Combine with tactical logic or AI systems for autonomous decisions.*
 
----
-
 ## 🛰️ Use Cases in Autonomous & Military Systems
 
 Antares Python Client acts as a **simulation substrate** for intelligent systems. Key applications include:
@@ -70,8 +64,6 @@ Antares Python Client acts as a **simulation substrate** for intelligent systems
 * ✅ **System validation under uncertainty**
   Test robustness of autonomous systems against unpredictable scenarios, sensor degradation, or adversarial tactics.
 
----
-
 ## 🌍 Designed for Integration
 
 You can easily:
@@ -83,13 +75,9 @@ You can easily:
 
 Antares Python Client has **zero external dependencies** beyond its own models and tools, ensuring it's lightweight and portable — ideal for secure or isolated environments.
 
----
-
 ## 🛡️ Robust. Modular. Battle-Ready.
 
 Whether you're building mission rehearsal tools, tactical planning apps, or AI-controlled defense simulations — `antares-python` offers a powerful, production-ready foundation for integration, testing, and innovation.
-
----
 
 ## 🔗 Learn More
 

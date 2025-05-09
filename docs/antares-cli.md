@@ -1,15 +1,20 @@
 ---
-title: "🛠️ antares-cli: Command-Line Control"
-description: "Use the antares-cli tool to prototype, command, and collect data from Antares simulations."
+order: 4
+icon: fas fa-terminal
+title: antares-cli
+description: >-
+  A command-line interface for prototyping, commanding, and collecting data from Antares simulations.
 ---
 
 ## 🛠️ antares-cli: Command-Line Control
 
 > **A lightweight interface for controlling Antares simulations via terminal commands.**
+{: .prompt-tip }
 
 `antares-cli` is a powerful tool for prototyping behaviors, capturing telemetry logs, and issuing real-time commands to the Antares simulation system — useful in both development and operational research settings.
 
----
+![CLI Usage](https://raw.githubusercontent.com/TheSoftwareDesignLab/ANTARES/refs/heads/main/docs/assets/antares-cli.png){: width="700" }
+_Subscribing to simulation events and issuing commands via the CLI._
 
 ## ⚙️ Core Capabilities
 
@@ -21,8 +26,6 @@ description: "Use the antares-cli tool to prototype, command, and collect data f
 - 🧩 **Integrate with external systems** by sending programmatic commands to a shared simulation backend
 
 ➡️ Multiple CLI clients can connect concurrently to a central simulation — ideal for distributed experimentation.
-
----
 
 ## 🚧 Usage
 
@@ -45,13 +48,11 @@ Once installed, the `antares-cli` binary is available globally.
 | `--verbose`   | Enable detailed output                          |
 | `--json`      | Output results in JSON format (structured logs) |
 
----
-
 ## 💡 Example
 
 ```bash
 antares-cli add-ship --type line --x 0 --y 0 --angle 0.5 --speed 5.0
-````
+```
 
 ➡️ This creates a ship moving along a fixed heading at 5 m/s.
 You can then subscribe to track updates and log them using:
@@ -59,8 +60,6 @@ You can then subscribe to track updates and log them using:
 ```bash
 antares-cli subscribe
 ```
-
----
 
 ## 📎 Technical Details
 
