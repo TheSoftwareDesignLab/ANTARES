@@ -5,19 +5,15 @@
 //!
 
 use super::{RadarConfig, SimulationConfig};
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Deserialize)]
+#[derive(Serialize, Deserialize, Debug, Default, Clone)]
 pub struct Config {
-    pub simulation: SimulationConfig,
-    pub radar: RadarConfig,
+    pub antares: AntaresConfig,
 }
 
-impl Default for Config {
-    fn default() -> Self {
-        Self {
-            simulation: SimulationConfig::default(),
-            radar: RadarConfig::default(),
-        }
-    }
+#[derive(Serialize, Deserialize, Debug, Default, Clone)]
+pub struct AntaresConfig {
+    pub simulation: SimulationConfig,
+    pub radar: RadarConfig,
 }

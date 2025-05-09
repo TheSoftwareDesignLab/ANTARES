@@ -1,6 +1,6 @@
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct RadarConfig {
     pub detector: DetectorConfig,
     pub broadcast: BroadcastConfig,
@@ -17,7 +17,7 @@ impl Default for RadarConfig {
     }
 }
 
-#[derive(Debug, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct DetectorConfig {
     pub range: f64,
     pub speed: f64,
@@ -36,7 +36,7 @@ impl Default for DetectorConfig {
     }
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(tag = "type", rename_all = "lowercase")]
 pub enum BroadcastConfig {
     Tcp,

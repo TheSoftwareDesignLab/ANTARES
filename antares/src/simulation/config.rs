@@ -1,9 +1,9 @@
 use super::{
     CircleMovement, LineMovement, MovementStrategy, RandomMovement, Ship, StationaryMovement,
 };
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct SimulationConfig {
     pub emission_interval: u64,
     pub initial_ships: Vec<ShipConfig>,
@@ -20,14 +20,14 @@ impl Default for SimulationConfig {
     }
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct ShipConfig {
     pub initial_position: (f64, f64),
     #[serde(flatten)]
     pub movement: MovementType,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(tag = "type", rename_all = "lowercase")]
 pub enum MovementType {
     Line { angle: f64, speed: f64 },

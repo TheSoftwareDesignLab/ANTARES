@@ -11,8 +11,15 @@ async-trait = "0.1.88"
 tokio-tungstenite = "0.26.2"
 futures-util = "0.3.31"
 futures = "0.3.31"
-axum = "0.8.4"
+axum = { version = "0.8.4", features = [
+    "json",
+    "macros",
+    "tokio",
+    "http1",
+    "tower-log",
+] }
 tokio = { version = "1", features = ["full"] }
 hyper = { version = "1", features = ["full"] }
 serde = { version = "1", features = ["derive"] }
 clap = { version = "4.5.37", features = ["derive"] }
+tower-http = { version = "0.6.2", features = ["cors"] }

@@ -1,7 +1,12 @@
 use antares::{Config, Controller, ShipConfig};
-use axum::{extract::State, routing::post, Json, Router};
+use axum::{
+    extract::State,
+    routing::{get, post},
+    Json, Router,
+};
 use clap::Parser;
 use std::{fs, net::SocketAddr, process, sync::Arc};
+use tower_http::cors::{Any, CorsLayer};
 
 #[derive(Parser)]
 #[command(author, version, about)]
@@ -29,17 +34,29 @@ async fn main() {
         None => Config::default(),
     };
 
-    let controller_bind_addr = config.simulation.controller_bind_addr.clone();
-    let controller = Arc::new(Controller::new(config));
+    let controller_config = config.clone();
+    let controller = Arc::new(Controller::new(controller_config));
 
     controller.run().await;
 
+    let cors = CorsLayer::new()
+        .allow_origin(Any)
+        .allow_methods(Any)
+        .allow_headers(Any);
+
     let app = Router::new()
+        .route("/simulation/config", get(get_config))
         .route("/simulation/reset", post(reset_simulation))
         .route("/simulation/ships", post(add_ship))
+        .layer(cors)
         .with_state(controller);
 
-    let addr: SocketAddr = controller_bind_addr.parse().unwrap();
+    let addr: SocketAddr = config
+        .antares
+        .simulation
+        .controller_bind_addr
+        .parse()
+        .unwrap();
     let listener = tokio::net::TcpListener::bind(&addr).await.unwrap();
     println!("🚢 Controller server running on {addr}");
 
@@ -53,6 +70,11 @@ async fn main() {
             println!("🛑 Received Ctrl+C, shutting down...");
         }
     }
+}
+
+#[axum::debug_handler]
+async fn get_config(State(controller): State<Arc<Controller>>) -> Json<Config> {
+    Json(controller.get_config())
 }
 
 async fn reset_simulation(State(controller): State<Arc<Controller>>) {

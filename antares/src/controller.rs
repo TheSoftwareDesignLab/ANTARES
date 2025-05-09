@@ -8,6 +8,7 @@ use std::sync::Arc;
 use tokio::sync::mpsc;
 
 pub struct Controller {
+    config: Config,
     radar: Arc<Radar>,
     simulation: Arc<Simulation>,
 }
@@ -15,8 +16,9 @@ pub struct Controller {
 impl Controller {
     pub fn new(config: Config) -> Controller {
         Controller {
-            radar: Arc::new(Radar::new(config.radar)),
-            simulation: Arc::new(Simulation::new(config.simulation)),
+            config: config.clone(),
+            radar: Arc::new(Radar::new(config.antares.radar)),
+            simulation: Arc::new(Simulation::new(config.antares.simulation)),
         }
     }
 
@@ -41,5 +43,9 @@ impl Controller {
 
     pub fn add_ship(&self, ship_data: ShipConfig) {
         self.simulation.add_ship(ship_data);
+    }
+
+    pub fn get_config(&self) -> Config {
+        self.config.clone()
     }
 }
