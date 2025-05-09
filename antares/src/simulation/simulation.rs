@@ -1,92 +1,73 @@
-use crate::simulation::emitters::Ship;
-use std::time::Duration;
+use std::sync::Arc;
+use tokio::sync::{mpsc::Sender, RwLock};
 
-use super::{
-    CircleMovement, Emitter, LineMovement, RandomMovement, SimulationConfig, StationaryMovement,
-    Wave,
-};
-use std::sync::mpsc::Sender;
-use std::thread;
+use super::{build_ship_from_config, Emitter, Ship, ShipConfig, SimulationConfig, Wave};
 
 pub struct Simulation {
-    config: SimulationConfig,
+    ships: Arc<RwLock<Vec<Ship>>>,
+    emission_interval: u64,
 }
 
 impl Simulation {
-    /// Create a new Simulation.
-    pub fn new(config: SimulationConfig) -> Simulation {
-        Simulation { config }
+    pub fn new(config: SimulationConfig) -> Self {
+        let ships = config
+            .initial_ships
+            .into_iter()
+            .enumerate()
+            .map(|(i, ship_config)| {
+                build_ship_from_config(i as u64, ship_config, config.emission_interval)
+            })
+            .collect();
+
+        Self {
+            ships: Arc::new(RwLock::new(ships)),
+            emission_interval: config.emission_interval,
+        }
     }
 
-    /// Start the simulation.
-    pub fn start(&self, wave_sender: Sender<Wave>) {
-        let emission_interval = self.config.emission_interval;
-        let mut ships = Vec::new();
-        let mut ship_id = 0;
+    pub fn reset(&self) {
+        let ships = Arc::clone(&self.ships);
+        tokio::spawn(async move {
+            ships.write().await.clear();
+        });
+    }
 
-        // Create ships with line movement
-        for line_ship in &self.config.ships.line {
-            let movement_strategy = Box::new(LineMovement::new(line_ship.angle, line_ship.speed));
-            ships.push(Ship {
-                id: ship_id,
-                position: line_ship.initial_position,
-                emission_interval,
-                movement_strategy,
-            });
-            ship_id += 1;
-        }
+    pub fn add_ship(&self, config: ShipConfig) {
+        let ships = Arc::clone(&self.ships);
+        let interval = self.emission_interval;
 
-        // Create ships with circle movement
-        for circle_ship in &self.config.ships.circle {
-            let movement_strategy = Box::new(CircleMovement::new(
-                circle_ship.radius,
-                circle_ship.speed,
-                emission_interval,
-            ));
-            ships.push(Ship {
-                id: ship_id,
-                position: circle_ship.initial_position,
-                emission_interval,
-                movement_strategy,
-            });
-            ship_id += 1;
-        }
+        tokio::spawn(async move {
+            let mut ships_guard = ships.write().await;
+            let new_id = ships_guard.len() as u64;
+            let ship = build_ship_from_config(new_id, config, interval);
+            ships_guard.push(ship);
+        });
+    }
 
-        // Create ships with random movement
-        for random_ship in &self.config.ships.random {
-            let movement_strategy = Box::new(RandomMovement::new(random_ship.max_speed));
-            ships.push(Ship {
-                id: ship_id,
-                position: random_ship.initial_position,
-                emission_interval,
-                movement_strategy,
-            });
-            ship_id += 1;
-        }
+    pub async fn start(&self, wave_sender: Sender<Wave>) {
+        let ships = self.ships.clone();
+        let interval = tokio::time::Duration::from_millis(self.emission_interval);
+        let mut ticker = tokio::time::interval(interval);
 
-        // Create ships with stationary movement
-        for stationary_ship in &self.config.ships.stationary {
-            let movement_strategy = Box::new(StationaryMovement {});
-            ships.push(Ship {
-                id: ship_id,
-                position: stationary_ship.initial_position,
-                emission_interval,
-                movement_strategy,
-            });
-            ship_id += 1;
-        }
+        tokio::spawn(async move {
+            loop {
+                ticker.tick().await;
 
-        thread::spawn(move || loop {
-            let mut waves = Vec::with_capacity(ships.len());
-            for ship in ships.iter_mut() {
-                let wave = ship.emit();
-                waves.push(wave);
-                ship.update();
+                let mut ships_guard = ships.write().await;
+                let mut waves = Vec::with_capacity(ships_guard.len());
+
+                for ship in ships_guard.iter_mut() {
+                    let wave = ship.emit();
+                    ship.update();
+                    waves.push(wave);
+                }
+
+                for wave in waves {
+                    if wave_sender.send(wave).await.is_err() {
+                        break;
+                    }
+                }
             }
-            for wave in waves {
-                wave_sender.send(wave).expect("Failed to send wave");
-            }
-            thread::sleep(Duration::from_millis(emission_interval));
         });
     }
 }

@@ -19,7 +19,7 @@ impl Ship {
 }
 
 impl Emitter for Ship {
-    fn emit(&mut self) -> Wave {
+    fn emit(&self) -> Wave {
         Wave {
             id: self.id,
             position: self.position,

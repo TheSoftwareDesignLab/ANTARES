@@ -17,7 +17,6 @@ Antares Python Client is a developer-friendly library and CLI tool that allows y
 
 Inspired by tools like PySpark, this library acts as a thin but powerful façade over the Antares backend.
 
----
 
 ## 🌟 Features
 
@@ -27,7 +26,6 @@ Inspired by tools like PySpark, this library acts as a thin but powerful façade
 - Configure everything via `.env` or `.toml`
 - Clean CLI with rich output and JSON support
 
----
 
 ## 🚀 Installation
 
@@ -52,7 +50,6 @@ source .venv/bin/activate
 uv pip install -e .
 ```
 
----
 
 ## 🚧 CLI Usage (`antares-cli`)
 
@@ -81,7 +78,6 @@ Example:
 antares-cli add-ship --type line --x 0 --y 0 --angle 0.5 --speed 5.0
 ```
 
----
 
 ## 📚 Python Usage Example
 
@@ -115,7 +111,7 @@ async def main():
     async for event in client.subscribe():
         if isinstance(event, Track):
             print(
-                f"📍 Track #{event.id} - {event.name} at ({event.lat}, {event.long}) → {event.speed} knots"
+                f"📍 Track #{event.id} - {event.name} at ({event.lat}, {event.long}) → {event.speed} m/s"
             )
 
 
@@ -124,7 +120,6 @@ if __name__ == "__main__":
     asyncio.run(main())
 ```
 
----
 
 ## 🧭 Ship Types
 
@@ -146,7 +141,6 @@ Each ship type corresponds to a specific Pydantic model:
 
 You can also use the generic `ShipConfig` union to parse from dynamic input like TOML or JSON.
 
----
 
 ## ⚙️ Configuration
 
@@ -157,11 +151,9 @@ The client supports two configuration methods:
 The `.env` file allows you to define environment variables:
 
 ```dotenv
-ANTARES_HOST=localhost
-ANTARES_HTTP_PORT=9000
-ANTARES_TCP_PORT=9001
+ANTARES_CONTROLLER_BIND_ADDR=0.0.0.0:17394
+ANTARES_RADAR_BIND_ADDR=0.0.0.0:17396
 ANTARES_TIMEOUT=5.0
-ANTARES_AUTH_TOKEN=
 ```
 
 ➡️ See `template.env` for a complete example.
@@ -171,29 +163,42 @@ ANTARES_AUTH_TOKEN=
 To configure the client and ships via a TOML file:
 
 ```toml
-[antares]
-host = "localhost"
-http_port = 9000
-tcp_port = 9001
-timeout = 5.0
-auth_token = ""
+[antares.radar]
+bind_addr = "0.0.0.0:17396"
 
-[[antares.ships.stationary]]
-initial_position = [50.0, 50.0]
+[antares.radar.detector]
+range = 1000.0
+speed = 0.0
+angle = 0.0
+start_coordinates = [4.0, -72.0]
 
-[[antares.ships.random]]
-initial_position = [-20.0, 20.0]
-max_speed = 10.0
+[antares.radar.broadcast]
+type = "tcp"
 
-[[antares.ships.circle]]
+[antares.simulation]
+emission_interval = 20
+controller_bind_addr = "0.0.0.0:17394"
+
+[[antares.simulation.initial_ships]]
+type = "line"
+initial_position = [0.0, 0.0]
+angle = 0.785
+speed = 5.0
+
+[[antares.simulation.initial_ships]]
+type = "circle"
 initial_position = [30.0, -30.0]
 radius = 20.0
 speed = 4.0
 
-[[antares.ships.line]]
-initial_position = [0.0, 0.0]
-angle = 0.785
-speed = 5.0
+[[antares.simulation.initial_ships]]
+type = "random"
+initial_position = [-20.0, 20.0]
+max_speed = 10.0
+
+[[antares.simulation.initial_ships]]
+type = "stationary"
+initial_position = [50.0, 50.0]
 ```
 
 ➡️ See `config.example.toml` for a full working example.
@@ -210,8 +215,6 @@ Or use it in Python with:
 from antares.config_loader import load_config
 settings = load_config("config.toml")
 ```
-
----
 
 ## 🧪 Development & Testing
 
@@ -247,24 +250,7 @@ pytest
 pytest --cov=antares --cov-report=term-missing
 ```
 
----
-
 ## 📄 License
 
-This project is licensed under the MIT License. See the [LICENSE](../LICENSE) file for details.
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
----
-
-## 🤝 Contributing
-
-Contributions are welcome! To contribute:
-
-1. Fork the repository
-2. Create a new branch (`git checkout -b feature/my-feature`)
-3. Make your changes
-4. Run `task check` and `task test` to ensure quality
-5. Submit a pull request 🚀
-
-For significant changes, please open an issue first to discuss what you’d like to do.
-
-Happy hacking! 🛠️

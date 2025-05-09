@@ -1,35 +1,42 @@
-use super::{Detector, RadarConfig, TrackControlInterface, TrackDataInterface, Tracker, Wave};
-use std::sync::mpsc;
-use std::thread;
+use super::broadcaster::{Broadcaster, TcpBroadcaster, WebSocketBroadcaster};
+use super::{BroadcastConfig, Detector, RadarConfig, Tracker, Wave};
+use std::sync::Arc;
+use tokio::sync::mpsc;
+use tokio::task;
 
 pub struct Radar {
     config: RadarConfig,
 }
 
 impl Radar {
-    pub fn new(config: RadarConfig) -> Radar {
-        Radar { config }
+    pub fn new(config: RadarConfig) -> Self {
+        Self { config }
     }
 
-    pub fn start(&self, wave_receiver: mpsc::Receiver<Wave>) {
-        let (plot_sender, plot_receiver) = mpsc::channel();
-        let (track_sender, track_receiver) = mpsc::channel();
+    pub async fn start(&self, wave_receiver: mpsc::Receiver<Wave>) {
+        let (plot_sender, plot_receiver) = mpsc::channel(100);
+        let (track_sender, mut track_receiver) = mpsc::channel(100);
 
         let detector = Detector::new(self.config.detector.clone());
         detector.start(wave_receiver, plot_sender);
         Tracker::start(plot_receiver, track_sender);
-        TrackControlInterface::new(
-            self.config.protocol.host.clone(),
-            self.config.protocol.num_workers_tci,
-        );
-        let tdi = TrackDataInterface::new(
-            self.config.protocol.host.clone(),
-            self.config.protocol.num_workers_tdi,
-        );
 
-        thread::spawn(move || {
-            while let Ok(track) = track_receiver.recv() {
-                tdi.broadcast(track);
+        let broadcaster: Arc<dyn Broadcaster> = match &self.config.broadcast {
+            BroadcastConfig::Tcp => Arc::new(TcpBroadcaster::new(self.config.bind_addr.clone())),
+            BroadcastConfig::WebSocket => {
+                Arc::new(WebSocketBroadcaster::new(self.config.bind_addr.clone()))
+            }
+        };
+
+        let broadcaster_clone = broadcaster.clone();
+        tokio::spawn(async move {
+            broadcaster_clone.start().await;
+        });
+
+        let sender = broadcaster.sender();
+        task::spawn(async move {
+            while let Some(track) = track_receiver.recv().await {
+                let _ = sender.send(track);
             }
         });
     }

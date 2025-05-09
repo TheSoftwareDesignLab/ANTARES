@@ -1,10 +1,25 @@
 [package]
-name = "naval-radar-simulator"
-version = "0.1.0"
+name = "antares"
+version = "1.0.0"
 edition = "2021"
 
 [dependencies]
 chrono = "0.4.38"
 rand = "0.8.5"
-serde = { version = "1.0.214", features = ["derive"] }
 toml = "0.8.19"
+async-trait = "0.1.88"
+tokio-tungstenite = "0.26.2"
+futures-util = "0.3.31"
+futures = "0.3.31"
+axum = { version = "0.8.4", features = [
+    "json",
+    "macros",
+    "tokio",
+    "http1",
+    "tower-log",
+] }
+tokio = { version = "1", features = ["full"] }
+hyper = { version = "1", features = ["full"] }
+serde = { version = "1", features = ["derive"] }
+clap = { version = "4.5.37", features = ["derive"] }
+tower-http = { version = "0.6.2", features = ["cors"] }

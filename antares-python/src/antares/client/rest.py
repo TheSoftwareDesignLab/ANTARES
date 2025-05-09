@@ -9,7 +9,7 @@ class RestClient:
     Internal client for interacting with the Antares simulation REST API.
     """
 
-    def __init__(self, base_url: str, timeout: float = 5.0, auth_token: str | None = None) -> None:
+    def __init__(self, base_url: str, timeout: float = 5.0) -> None:
         """
         Initializes the REST client.
 
@@ -20,7 +20,6 @@ class RestClient:
         """
         self.base_url = base_url.rstrip("/")
         self.timeout = timeout
-        self.headers = {"Authorization": f"Bearer {auth_token}"} if auth_token else {}
 
     def reset_simulation(self) -> None:
         """
@@ -29,7 +28,6 @@ class RestClient:
         try:
             response = httpx.post(
                 f"{self.base_url}/simulation/reset",
-                headers=self.headers,
                 timeout=self.timeout,
             )
             response.raise_for_status()
@@ -49,7 +47,6 @@ class RestClient:
             response = httpx.post(
                 f"{self.base_url}/simulation/ships",
                 json=ship.model_dump(),
-                headers=self.headers,
                 timeout=self.timeout,
             )
             response.raise_for_status()

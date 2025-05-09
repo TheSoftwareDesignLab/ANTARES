@@ -20,7 +20,7 @@
 /// - `winrgw`: Track search window range width in meters
 /// - `winazw`: Track search window azimuth width in radians
 /// - `stderr`: The tracker’s calculated standard error on the filtered track position in meters
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Track {
     pub id: u64,
     pub year: u32,

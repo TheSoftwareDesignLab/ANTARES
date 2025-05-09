@@ -17,7 +17,16 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-dev = ["pytest-asyncio>=0.26.0"]
+dev = [
+    "taskipy==1.14.1",
+    "build==1.2.2.post1",
+    "mypy==1.15.0",
+    "pytest==8.3.5",
+    "pytest-cov==6.1.1",
+    "pytest-mock==3.14.0",
+    "pytest-asyncio>=0.26.0",
+    "ruff==0.11.8",
+]
 
 [project.scripts]
 antares-cli = "antares.cli:app"

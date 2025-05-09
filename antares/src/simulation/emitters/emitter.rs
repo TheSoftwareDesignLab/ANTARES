@@ -1,5 +1,5 @@
 use super::Wave;
 
 pub trait Emitter {
-    fn emit(&mut self) -> Wave;
+    fn emit(&self) -> Wave;
 }

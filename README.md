@@ -1,105 +1,63 @@
-# ANTARES: A Software-Based Tool for Simulating Naval Radar Operations
+# ANTARES
 
-This repository contains the source code for ANTARES, a comprehensive naval radar simulation system designed to meet the operational needs of maritime security and training for the Colombian Navy. The system combines cutting-edge technology with modular and extensible architecture, providing a robust solution for naval simulation, real-time visualization, and tactical evaluation.
+**ANTARES** is an open-source, high-performance simulation platform for naval radar operations. It enables real-time, software-based simulation of maritime environments and radar tracking systems, with support for interactive visualization, TCP-based integration, and extensible simulation entities.
 
-## 🚢 **Project Overview**
+Developed with performance, modularity, and realism in mind, ANTARES supports both standalone and embedded use in larger C4I or Combat Management System (CMS) pipelines.
 
-### **Introduction**
+> 🧭 Showcase and live demos available at: [https://thesoftwaredesignlab.github.io/ANTARES](https://thesoftwaredesignlab.github.io/ANTARES)
 
-The project is aimed at developing an advanced naval radar simulator, capable of real-time detection, monitoring, and tracking of vessels in a simulated maritime environment. It supports realistic training, mission planning, and operational readiness, enhancing the Colombian Navy's capabilities and positioning it as a regional leader in naval technology.
+## Key Features
 
-### **Objective**
+- ⚡ **Real-Time Radar Simulation**  
+  Sub-10ms latency for real-time generation and transmission of radar data.
 
-- To design and implement a radar simulation system for generating and visualizing real-time data on vessel positions and movements in a simulated naval setting.
+- 🧱 **Modular & Extensible Architecture**  
+  Easily add new vessel behaviors, emitter types, or environmental effects.
 
-## 📂 **Repository Structure**
+- 🔒 **Secure & Standardized Communication**  
+  Transmit simulation data over TCP and WebSocket using standardized schemas.
 
-The repository is divided into three major components, each with its own dedicated subdirectory and README file for further details:
+- 🖥️ **Intuitive Web Interface**  
+  A reactive, interactive GUI for real-time control and visualization.
 
-### 1. **[Naval Radar Simulator](./naval-radar-simulator)**
+- 🚀 **High-Performance Core in Rust**  
+  Safety and speed for heavy computations and concurrent streaming.
 
-- Implements the radar simulation engine, responsible for generating radar data in real-time.
-- Developed in **Rust**, prioritizing:
-  - High performance.
-  - Security and low-level control.
-  - Configurability via TOML configuration files.
-- Real-time data is transmitted using TCP sockets.
-- Modular design supports extensibility for new features such as movement patterns, physical conditions, and custom tracking algorithms.
+## Repository Structure
 
-**Instructions to Run**:
+This monorepo contains all components of the ANTARES platform:
 
-```bash
-cd naval-radar-simulator
-cargo run -- <config-file>
+```
+ANTARES/
+├── antares/           # Core simulator (Rust)
+├── antares-python/    # Python client SDK
+├── antares-web/       # Web-based interface and dashboard (TypeScript + React)
+├── docs/              # Markdown source for documentation website
+├── LICENSE            # MIT License
+└── README.md          # You're here
 ```
 
-Replace `<config-file>` with the path to the desired TOML configuration file. Further setup instructions can be found in the subdirectory's [README](./naval-radar-simulator/README.md).
+Each subproject includes its own README with installation and usage instructions.
 
-### 2. **[Naval Radar Web UI](./naval-radar-web-ui)**
+- **[antares](./antares)** — The simulation engine written in Rust  
+- **[antares-python](./antares-python)** — A Python SDK and CLI for controlling and subscribing to simulation output  
+- **[antares-web](./antares-web)** — The user-facing control and visualization interface  
+- **[docs](./docs)** — Sources for the project website, built using [showcase-chirpy-easy-docs](https://github.com/jsurrea/showcase-chirpy-easy-docs)
 
-- A **React-based user interface** for visualizing radar data.
-- Features include:
-  - Real-time radar display with panning and zoom functionality.
-  - Chat and control interface for interacting with the radar simulation.
-  - Communication with the radar engine using WebSockets.
+## About the Project
 
-**Instructions to Run**:
+> **ANTARES**: *A Software-Based Tool for Simulating Naval Radar Operations*  
+> Presented at the **International Conference on Military Technologies 2025**, Brno, Czechia.
 
-```bash
-cd naval-radar-web-ui
-npm install
-npm start
-```
+**Abstract**  
+Simulation is a cost-effective method for training personnel in virtual environments before operating real machines or interacting with real and complex scenarios. Moreover, simulation is also valuable for analyzing the behavior of both deployed systems and those under development. For instance, the design and operation of Combat Management and C4I systems, which are inherently complex, have utilized simulation for early validation as well as for training Navy officers and enlisted personnel.
 
-Open the interface in your browser at `http://localhost:5173`. Detailed information is available in the subdirectory's [README](./naval-radar-web-ui/README.md).
+We present ANTARES, an open-source, software-based naval radar simulator. ANTARES is designed to seamlessly integrate with other systems via the TCP protocol while supporting standalone operation through a Graphical User Interface (GUI). Additionally, it adheres to the open-closed design principle, facilitating easy extensibility with new simulation entities, such as naval vessel movement strategies. The simulator was implemented using the Rust programming language due to its advantages in performance, type safety, concurrency, and memory safety. As an initial validation, we conducted a usability and usefulness study with 12 officers and enlisted personnel from the Colombian Navy. ANTARES is released under the MIT license.
 
-### 3. **[Naval Radar Reverse Proxy](./naval-radar-reverse-proxy)**
+## Credits
 
-- Handles WebSocket connections between the web UI and radar simulation engine.
-- Ensures secure and optimized data transfer.
-- Configured to work seamlessly with both the simulation and web UI components.
+This project was developed by **Juan Sebastian Urrea-Lopez** as part of research initiatives at **Universidad de los Andes**, in collaboration with the **Armada de la República de Colombia**.
 
-**Instructions to Run**:
+## License
 
-```bash
-cd naval-radar-reverse-proxy
-npm install
-npm start
-```
-
-Configuration details can be found in the subdirectory's [README](./naval-radar-reverse-proxy/README.md).
-
-## 🔧 **Key Features**
-
-- **Real-Time Radar Simulation**: Sub-10ms latency for precise real-time data.
-- **Extensibility**: Modular architecture allows integration of new entities and algorithms.
-- **Secure Communication**: Data is transmitted securely via standardized TCP and WebSocket protocols.
-- **Intuitive User Interface**: A highly interactive, user-friendly web interface for visualization and control.
-- **High Performance**: Built in Rust for efficient handling of radar computations and data streaming.
-
-## 📊 **Results and Impact**
-
-The simulator achieves its objectives by:
-
-1. Offering real-time, precise radar tracking.
-2. Providing extensibility for future needs, including new physical conditions and tracking enhancements.
-3. Meeting the operational training requirements of the Colombian Navy.
-
-**System Performance**:
-
-- Sub-10ms latency for seamless real-time updates.
-- Modular components ensure flexibility and scalability.
-
-## 📜 **References**
-
-For further information on specific components, refer to the README files located in their respective directories:
-
-- [Naval Radar Simulator](./naval-radar-simulator/README.md)
-- [Naval Radar Web UI](./naval-radar-web-ui/README.md)
-- [Naval Radar Reverse Proxy](./naval-radar-reverse-proxy/README.md)
-
-## 📥 **Contributions**
-
-This project was developed by **Juan Sebastian Urrea Lopez** as part of research initiatives at **Universidad de los Andes**, in collaboration with the **Armada de la República de Colombia**.
-
-For any contributions, suggestions, or issues, feel free to open a pull request or contact the authors directly.
+ANTARES is released under the [MIT License](./LICENSE).  
