@@ -56,7 +56,12 @@ We present ANTARES, an open-source, software-based naval radar simulator. ANTARE
 
 ## Credits
 
-This project was developed by **Juan Sebastian Urrea-Lopez** as part of research initiatives at **Universidad de los Andes**, in collaboration with the **Armada de la República de Colombia**.
+This project was developed jointly by The Software Design Lab at Universidad de los Andes and the Colombian Navy.
+
+**Authors:**
+- Juan Sebastian Urrea-Lopez (Universidad de los Andes) <js.urrea@uniandes.edu.co>
+- Camilo Barreto-Reyes (Universidad de los Andes, Colombian Navy) <c.barretor@uniandes.edu.co>
+- Mario Linares-Vásquez (Universidad de los Andes) <m.linaresv@uniandes.edu.co>
 
 ## License
 

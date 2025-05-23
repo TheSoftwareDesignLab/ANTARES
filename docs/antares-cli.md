@@ -63,5 +63,5 @@ antares-cli subscribe
 
 ## 📎 Technical Details
 
-For installation instructions, configuration schema, and developer options, see the [antares-python GitHub repository](https://github.com/jsurrea/antares-python).
+For installation instructions, configuration schema, and developer options, see the [antares-python GitHub repository](https://github.com/TheSoftwareDesignLab/ANTARES/tree/main/antares-python).
 
