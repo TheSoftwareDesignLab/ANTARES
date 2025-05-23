@@ -6,20 +6,20 @@ toc: true
 # ⚓ ANTARES
 ## A Modern, Open-Source Platform for Simulating Naval Radar Operations
 
-**ANTARES** is a modular, real-time radar simulator developed for training, validation, and research in naval environments.  
-It seamlessly integrates with modern systems, while remaining intuitive, secure, and extensible.  
+**ANTARES** is a modular, real-time radar simulator developed for training, validation, and research in naval environments. It seamlessly integrates with modern systems, while remaining intuitive, secure, and extensible.  
 
 ## 🎯 Mission
 
 **Prepare. Validate. Evolve.**
 
-ANTARES is designed to serve **military training programs**, **system integrators**, and **research teams** by simulating realistic naval radar operations in software. It empowers decision-making and systems engineering—*before touching real hardware*.
+ANTARES is designed to serve **military training programs**, **system integrators**, and **research teams** by simulating realistic naval radar operations in software. It empowers decision-making and systems engineering *before touching real hardware*.
 
 ## 🔍 What is ANTARES?
 
-**ANTARES** is an open-source project developed by **Juan Sebastián Urrea-López** at **Universidad de los Andes**, in collaboration with the **Colombian Navy**.
+**ANTARES** is an open-source project developed by **The Software Design Lab** at **Universidad de los Andes**, in collaboration with the **Colombian Navy**.
 
-> This work is presented in the paper: **“ANTARES: A Software-Based Tool for Simulating Naval Radar Operations”**  
+> This work is presented in the paper: 
+**“ANTARES: A Software-Based Tool for Simulating Naval Radar Operations”**  
 _International Conference on Military Technologies 2025_  
 Brno, Czechia  
 {: .prompt-info }
@@ -65,32 +65,19 @@ Feedback confirmed its:
 The platform is composed of multiple sub-projects, each with a focused role:
 
 ### 🧠 [`antares-simulator`](antares-simulator/)
-> High-performance simulation engine written in **Rust**  
-> Simulates ship motion, wave interaction, radar detection, and signal broadcasting  
-{: .prompt-info }
+High-performance simulation engine written in **Rust**. Simulates ship motion, wave interaction, radar detection, and signal broadcasting  
 
 ### 🌐 [`antares-web`](antares-web/)
-> Interactive web interface for configuring simulations, tracking targets, and visualizing radar output in real time  
-{: .prompt-info }
+Interactive web interface for configuring simulations, tracking targets, and visualizing radar output in real time  
 
 ### 🧪 [`antares-python`](antares-python/)
-> Python SDK for scripting simulation workflows and integrating with external platforms or AI agents  
-{: .prompt-info }
+Python SDK for scripting simulation workflows and integrating with external platforms or AI agents  
 
 ### 💻 [`antares-cli`](antares-cli/)
-> Terminal interface for automation, testing, and headless execution of ANTARES simulations  
+Terminal interface for automation, testing, and headless execution of ANTARES simulations  
+
+> All components are released under the MIT License and designed to work independently or as an integrated system.
 {: .prompt-info }
-
-All components are released under the MIT License and designed to work independently or as an integrated system.
-
-## 📄 Documentation
-
-All documentation is written in Markdown and compiled automatically using  
-👉 [**showcase-chirpy-easy-docs**](https://github.com/jsurrea/showcase-chirpy-easy-docs)  
-powered by GitHub Actions.
-
-> View individual guides, tutorials, and API references inside the `docs/` folder or through each sub-project’s page.  
-{: .prompt-tip }
 
 ## 🌍 Impact
 
@@ -101,21 +88,18 @@ ANTARES brings the power of simulation to modern naval operations by:
 - **Improving readiness** with repeatable and measurable scenarios
 - **Democratizing access** to radar simulation technologies through open source
 
-> Simulation is not just a convenience — it is a strategic enabler for defense innovation.  
-{: .prompt-danger }
-
 ## 📬 Contact
 
-**Juan Sebastian Urrea-Lopez**  
-Lead Developer & Researcher  
-[📧 Contact](mailto:js.urrea@uniandes.edu.co)
+**Project Authors:**  
+- **Juan Sebastian Urrea-Lopez** (Universidad de los Andes) <js.urrea@uniandes.edu.co>
+- **Camilo Barreto-Reyes** (Universidad de los Andes / Colombian Navy) <c.barretor@uniandes.edu.co>
+- **Mario Linares-Vásquez** (Universidad de los Andes) <m.linaresv@uniandes.edu.co>
+
+*Developed through a collaboration between:*  
+🔹 **The Software Design Lab** at Universidad de los Andes  
+🔹 **Armada de la República de Colombia**  
 
 ## 🔗 Links
 
 - 🔗 [GitHub Repository](https://github.com/thesoftwaredesignlab/ANTARES)
-- 🔗 [Project Website](https://thesoftwaredesignlab.github.io/ANTARES)
 - 🔗 [Conference Info](https://icmt2025.cz)
-
-> Ready to explore?  
-Start with the simulator 👉 [`antares/`](./antares/)
-{: .prompt-success }

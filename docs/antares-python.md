@@ -81,4 +81,4 @@ Whether you're building mission rehearsal tools, tactical planning apps, or AI-c
 
 ## 🔗 Learn More
 
-Full technical details, API reference, and source code are available at the [GitHub repository](https://github.com/TheSoftwareDesignLab/ANTARES/antares-python).
+Full technical details, API reference, and source code are available at the [GitHub repository](https://github.com/TheSoftwareDesignLab/ANTARES/tree/main/antares-python).

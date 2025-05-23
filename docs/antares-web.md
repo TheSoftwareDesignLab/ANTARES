@@ -51,5 +51,5 @@ _Adding a new vessel with customizable parameters_
 ## Learn More
 
 For source code, contributions, or in-depth technical details, visit the GitHub repository:  
-👉 [https://github.com/TheSoftwareDesignLab/ANTARES/antares-web](https://github.com/TheSoftwareDesignLab/ANTARES/antares-web)
+👉 [https://github.com/TheSoftwareDesignLab/ANTARES/tree/main/antares-web](https://github.com/TheSoftwareDesignLab/ANTARES/tree/main/antares-web)
 

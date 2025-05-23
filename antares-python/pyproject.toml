@@ -1,9 +1,11 @@
 [project]
 name = "antares-python"
-version = "0.1.2"
+version = "1.0.0"
 description = "Python interface for the Antares simulation software"
 authors = [
     { name = "Juan Sebastian Urrea-Lopez", email = "js.urrea@uniandes.edu.co" },
+    { name = "Camilo Barreto-Reyes", email = "c.barretor@uniandes.edu.co" },
+    { name = "Mario Linares-Vásquez", email = "m.linaresv@uniandes.edu.co" },
 ]
 readme = "README.md"
 requires-python = ">=3.13"
